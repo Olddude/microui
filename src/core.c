@@ -55,8 +55,9 @@ create_context_with_args(execution_strategy_t strategy, int argc, char **argv, c
     }
 
     execution_context_t *ctx = malloc(sizeof(execution_context_t));
-    if (!ctx)
+    if (!ctx) {
         return NULL;
+    }
 
     memset(ctx, 0, sizeof(execution_context_t));
     ctx->strategy = strategy;
@@ -100,8 +101,9 @@ void set_context_args(execution_context_t *ctx, int argc, char **argv, char **en
 // Factory function to create callback chain node
 static callback_chain_t *create_chain(callback_t callback) {
     callback_chain_t *chain = malloc(sizeof(callback_chain_t));
-    if (!chain)
+    if (!chain) {
         return NULL;
+    }
 
     chain->callback = callback;
     chain->next = NULL;
@@ -123,8 +125,9 @@ void destroy_context(execution_context_t *ctx) {
     callback_chain_t *current = ctx->chain;
     while (current) {
         callback_chain_t *next = current->next;
-        if (current->data)
+        if (current->data) {
             free(current->data);
+        }
         free(current);
         current = next;
     }
@@ -169,8 +172,9 @@ ctx_filter(execution_context_t *ctx, bool (*predicate)(int argc, char **argv, ch
 }
 
 static void ctx_merge_with(execution_context_t *ctx, execution_context_t *other) {
-    if (!ctx || !other || !other->chain)
+    if (!ctx || !other || !other->chain) {
         return;
+    }
 
     // Merge the other context's chain into this one
     if (!ctx->chain) {
@@ -195,8 +199,9 @@ static void ctx_switch_strategy(execution_context_t *ctx, execution_strategy_t s
 }
 
 static void ctx_execute(execution_context_t *ctx) {
-    if (!ctx || ctx->completed)
+    if (!ctx || ctx->completed) {
         return;
+    }
 
     switch (ctx->strategy) {
     case EXEC_SEQUENTIAL:
@@ -246,8 +251,9 @@ static void execute_sequential(execution_context_t *ctx) {
 }
 
 static void execute_parallel(execution_context_t *ctx) {
-    if (!ctx->chain)
+    if (!ctx->chain) {
         return;
+    }
 
     // Count callbacks
     int callback_count = 0;
@@ -358,8 +364,9 @@ static void install_signal_handlers(void) {
 }
 
 static void register_context(execution_context_t *ctx) {
-    if (!ctx)
+    if (!ctx) {
         return;
+    }
 
     pthread_mutex_lock(&context_registry_mutex);
 
@@ -383,8 +390,9 @@ static void register_context(execution_context_t *ctx) {
 }
 
 static void unregister_context(const execution_context_t *ctx) {
-    if (!ctx)
+    if (!ctx) {
         return;
+    }
 
     pthread_mutex_lock(&context_registry_mutex);
 
