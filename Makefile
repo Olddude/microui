@@ -1,7 +1,7 @@
 # Microui Build System
 
 VERSION = $(shell grep '^version' microui.conf 2>/dev/null | cut -d' ' -f2 || echo "latest")
-PREFIX ?= /usr/local
+PREFIX ?= $(shell pwd)/.local
 BUILD_TYPE ?= Release
 
 # OS Detection
@@ -25,7 +25,7 @@ endif
 CC ?= gcc
 AR ?= ar
 CFLAGS ?= -std=c11 -Isrc -Iinclude $(SDL2_CFLAGS) -Wall -pedantic
-LDFLAGS ?= $(SDL2_LIBS) $(GLFLAG) -lm
+LDFLAGS ?= $(SDL2_LIBS) $(GLFLAG) -lm -lpthread
 DEBUG_FLAGS ?= -g -DDEBUG -O0
 RELEASE_FLAGS ?= -O3
 TEST_FLAGS ?= -DTEST_MODE
@@ -34,18 +34,22 @@ TARGET ?= microui
 LIB_TARGET ?= lib$(TARGET).a
 
 HEADERS = \
+	include/core.h \
 	include/microui.h \
 	include/renderer.h \
 	include/client.h \
 	include/server.h \
-	include/window.h
+	include/window.h \
+	include/console.h
 
 SOURCES = \
+	src/core.c \
 	src/microui.c \
 	src/renderer.c \
 	src/client.c \
 	src/server.c \
-	src/window.c
+	src/window.c \
+	src/console.c
 
 MAIN = src/main.c
 
@@ -64,6 +68,11 @@ PUBLISH_SHARE_DIR = $(PUBLISH_DIR)/share
 PUBLISH_INCLUDE_DIR = $(PUBLISH_DIR)/include
 
 ARTIFACTS_DIR = artifacts
+
+# Logging configuration
+LOGS_DIR = logs
+BUILD_TIMESTAMP := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+LOG_FILE = $(LOGS_DIR)/$(BUILD_TIMESTAMP).log
 
 BIN_DIR = $(PREFIX)/bin
 INCLUDE_DIR = $(PREFIX)/include/$(TARGET)
@@ -110,25 +119,30 @@ SHARE_FILES = microui.conf
 	major \
 	ldd
 
-all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(LOGS_DIR)
+	@echo "🎯 Build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
-lib: $(DIST_LIB_DIR)/$(LIB_TARGET) headers
+lib: $(DIST_LIB_DIR)/$(LIB_TARGET) headers | $(LOGS_DIR)
+	@echo "📚 Library build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
 debug: CFLAGS += $(DEBUG_FLAGS)
-debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(LOGS_DIR)
+	@echo "🐛 Debug build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
 release: CFLAGS += $(RELEASE_FLAGS)
-release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(LOGS_DIR)
+	@echo "🚀 Release build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
-static:
-	@echo "🔗 Building with static linking for $(OS_NAME)..."
+static: | $(LOGS_DIR)
+	@echo "🔗 Building with static linking for $(OS_NAME)..." | tee -a $(LOG_FILE)
 ifeq ($(OS_NAME),Msys)
-	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lopengl32 -lm -lwinmm -lole32 -loleaut32 -limm32 -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lopengl32 -lm -lwinmm -lole32 -loleaut32 -limm32 -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
 else ifeq ($(OS_NAME),Darwin)
-	$(MAKE) LDFLAGS="/opt/homebrew/lib/libSDL2.a /opt/homebrew/lib/libSDL2main.a -framework OpenGL -framework CoreGraphics -framework CoreServices -framework ForceFeedback -framework Cocoa -framework Carbon -framework IOKit -framework CoreAudio -framework CoreFoundation -framework CoreHaptics -framework GameController -framework Metal -framework AudioToolbox -framework AVFoundation -framework CoreVideo -framework QuartzCore -lm -liconv" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+	$(MAKE) LDFLAGS="/opt/homebrew/lib/libSDL2.a /opt/homebrew/lib/libSDL2main.a -framework OpenGL -framework CoreGraphics -framework CoreServices -framework ForceFeedback -framework Cocoa -framework Carbon -framework IOKit -framework CoreAudio -framework CoreFoundation -framework CoreHaptics -framework GameController -framework Metal -framework AudioToolbox -framework AVFoundation -framework CoreVideo -framework QuartzCore -lm -liconv" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
 else
-	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lGL -lm -lpthread -ldl -lasound -lpulse -lX11 -lXext -lXcursor -lXinerama -lXi -lXrandr -lXss -lXxf86vm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lGL -lm -lpthread -ldl -lasound -lpulse -lX11 -lXext -lXcursor -lXinerama -lXi -lXrandr -lXss -lXxf86vm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
 endif
+	@echo "🔗 Static build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
 dev-dependencies:
 	@echo "🛠️  Installing development dependencies for $(OS_NAME)..."
@@ -167,66 +181,66 @@ else
 	@echo "✅ SDL2 development libraries installed successfully"
 endif
 
-share: | $(DIST_SHARE_DIR)
-	@echo "⚙️  Configuring project..."
+share: | $(DIST_SHARE_DIR) $(LOGS_DIR)
+	@echo "⚙️  Configuring project..." | tee -a $(LOG_FILE)
 	@cp microui.conf $(DIST_SHARE_DIR)/
-	@echo "✅ Configuration files copied to $(DIST_SHARE_DIR)/"
+	@echo "✅ Configuration files copied to $(DIST_SHARE_DIR)/" | tee -a $(LOG_FILE)
 
-headers: | $(DIST_INCLUDE_DIR)
-	@echo "📋 Copying headers to dist/include/..."
+headers: | $(DIST_INCLUDE_DIR) $(LOGS_DIR)
+	@echo "📋 Copying headers to dist/include/..." | tee -a $(LOG_FILE)
 	@cp $(HEADERS) $(DIST_INCLUDE_DIR)/
-	@echo "✅ Headers copied to $(DIST_INCLUDE_DIR)/"
+	@echo "✅ Headers copied to $(DIST_INCLUDE_DIR)/" | tee -a $(LOG_FILE)
 
-$(DIST_BIN_DIR)/$(TARGET): $(OBJ_FILES) $(MAIN_OBJ_FILE) | $(DIST_BIN_DIR)
-	@echo "🔗 Linking objects into executable $(TARGET)..."
-	@echo "   Objects: $(notdir $(OBJ_FILES)) $(notdir $(MAIN_OBJ_FILE))"
-	$(CC) $(OBJ_FILES) $(MAIN_OBJ_FILE) -o $@ $(LDFLAGS)
-	@echo "✅ Built executable $(TARGET) successfully"
+$(DIST_BIN_DIR)/$(TARGET): $(OBJ_FILES) $(MAIN_OBJ_FILE) | $(DIST_BIN_DIR) $(LOGS_DIR)
+	@echo "🔗 Linking objects into executable $(TARGET)..." | tee -a $(LOG_FILE)
+	@echo "   Objects: $(notdir $(OBJ_FILES)) $(notdir $(MAIN_OBJ_FILE))" | tee -a $(LOG_FILE)
+	$(CC) $(OBJ_FILES) $(MAIN_OBJ_FILE) -o $@ $(LDFLAGS) 2>&1 | tee -a $(LOG_FILE)
+	@echo "✅ Built executable $(TARGET) successfully" | tee -a $(LOG_FILE)
 
-$(DIST_LIB_DIR)/$(LIB_TARGET): $(OBJ_FILES) | $(DIST_LIB_DIR)
-	@echo "📚 Creating static library $(LIB_TARGET)..."
-	@echo "   Archive: $(notdir $(OBJ_FILES))"
-	$(AR) rcs $@ $(OBJ_FILES)
-	@echo "✅ Built static library $(LIB_TARGET) successfully"
+$(DIST_LIB_DIR)/$(LIB_TARGET): $(OBJ_FILES) | $(DIST_LIB_DIR) $(LOGS_DIR)
+	@echo "📚 Creating static library $(LIB_TARGET)..." | tee -a $(LOG_FILE)
+	@echo "   Archive: $(notdir $(OBJ_FILES))" | tee -a $(LOG_FILE)
+	$(AR) rcs $@ $(OBJ_FILES) 2>&1 | tee -a $(LOG_FILE)
+	@echo "✅ Built static library $(LIB_TARGET) successfully" | tee -a $(LOG_FILE)
 
-$(DIST_OBJ_DIR)/%.o: src/%.c $(HEADERS) | $(DIST_OBJ_DIR)
-	@echo "🔨 Compiling $< → $(notdir $@)"
-	$(CC) $(CFLAGS) -c $< -o $@
+$(DIST_OBJ_DIR)/%.o: src/%.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling $< → $(notdir $@)" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c $< -o $@ 2>&1 | tee -a $(LOG_FILE)
 
-test-unit: $(DIST_TEST_DIR)/unit_tests share
-	@echo "🧪 Running unit tests..."
+test-unit: $(DIST_TEST_DIR)/unit_tests share | $(LOGS_DIR)
+	@echo "🧪 Running unit tests..." | tee -a $(LOG_FILE)
 	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./unit_tests
+	@cd $(DIST_TEST_DIR) && ./unit_tests 2>&1 | tee -a ../$(LOG_FILE)
 
-test-integration: $(DIST_TEST_DIR)/integration_tests share
-	@echo "🔬 Running integration tests..."
+test-integration: $(DIST_TEST_DIR)/integration_tests share | $(LOGS_DIR)
+	@echo "🔬 Running integration tests..." | tee -a $(LOG_FILE)
 	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./integration_tests
+	@cd $(DIST_TEST_DIR) && ./integration_tests 2>&1 | tee -a ../$(LOG_FILE)
 
-test-performance: $(DIST_TEST_DIR)/performance_tests share
-	@echo "⚡ Running performance tests..."
+test-performance: $(DIST_TEST_DIR)/performance_tests share | $(LOGS_DIR)
+	@echo "⚡ Running performance tests..." | tee -a $(LOG_FILE)
 	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./performance_tests
+	@cd $(DIST_TEST_DIR) && ./performance_tests 2>&1 | tee -a ../$(LOG_FILE)
 
-$(DIST_TEST_DIR)/unit_tests: tests/unit_tests.c $(HEADERS) | $(DIST_TEST_DIR)
-	@echo "🔨 Building unit tests..."
-	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/unit_tests.c -o $@ $(LDFLAGS)
+$(DIST_TEST_DIR)/unit_tests: tests/unit_tests.c $(HEADERS) | $(DIST_TEST_DIR) $(LOGS_DIR)
+	@echo "🔨 Building unit tests..." | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/unit_tests.c -o $@ $(LDFLAGS) 2>&1 | tee -a $(LOG_FILE)
 
-$(DIST_TEST_DIR)/integration_tests: tests/integration_tests.c $(HEADERS) | $(DIST_TEST_DIR)
-	@echo "🔨 Building integration tests..."
-	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/integration_tests.c -o $@ $(LDFLAGS)
+$(DIST_TEST_DIR)/integration_tests: tests/integration_tests.c $(HEADERS) $(DIST_OBJ_DIR)/core.o | $(DIST_TEST_DIR) $(LOGS_DIR)
+	@echo "🔨 Building integration tests..." | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/integration_tests.c $(DIST_OBJ_DIR)/core.o -o $@ $(LDFLAGS) 2>&1 | tee -a $(LOG_FILE)
 
-$(DIST_TEST_DIR)/performance_tests: tests/performance_tests.c $(HEADERS) | $(DIST_TEST_DIR)
-	@echo "🔨 Building performance tests..."
-	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/performance_tests.c -o $@ $(LDFLAGS)
+$(DIST_TEST_DIR)/performance_tests: tests/performance_tests.c $(HEADERS) | $(DIST_TEST_DIR) $(LOGS_DIR)
+	@echo "🔨 Building performance tests..." | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) $(TEST_FLAGS) tests/performance_tests.c -o $@ $(LDFLAGS) 2>&1 | tee -a $(LOG_FILE)
 
-check: $(SOURCES) $(HEADERS)
-	@echo "🔍 Running static analysis..."
-	@cppcheck --enable=all --std=c11 src/ include/ tests/
+check: $(SOURCES) $(HEADERS) | $(LOGS_DIR)
+	@echo "🔍 Running static analysis..." | tee -a $(LOG_FILE)
+	@cppcheck --enable=all --std=c11 src/ include/ tests/ 2>&1 | tee -a $(LOG_FILE)
 
-lint: $(SOURCES) $(HEADERS)
-	@echo "🔍 Checking code style..."
-	@clang-format --dry-run --Werror src/*.c include/*.h tests/*.c
+lint: $(SOURCES) $(HEADERS) | $(LOGS_DIR)
+	@echo "🔍 Checking code style..." | tee -a $(LOG_FILE)
+	@clang-format --dry-run --Werror src/*.c include/*.h tests/*.c 2>&1 | tee -a $(LOG_FILE)
 
 ldd: $(DIST_BIN_DIR)/$(TARGET)
 	@echo "🔍 Checking executable dependencies..."
@@ -256,15 +270,18 @@ $(DIST_SHARE_DIR):
 $(DIST_INCLUDE_DIR):
 	@mkdir -p $(DIST_INCLUDE_DIR)
 
-publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(PUBLISH_BIN_DIR) $(PUBLISH_LIB_DIR) $(PUBLISH_SHARE_DIR) $(PUBLISH_INCLUDE_DIR) $(ARTIFACTS_DIR)
-	@echo "📦 Preparing publish package..."
+$(LOGS_DIR):
+	@mkdir -p $(LOGS_DIR)
+
+publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(PUBLISH_BIN_DIR) $(PUBLISH_LIB_DIR) $(PUBLISH_SHARE_DIR) $(PUBLISH_INCLUDE_DIR) $(ARTIFACTS_DIR) $(LOGS_DIR)
+	@echo "📦 Preparing publish package..." | tee -a $(LOG_FILE)
 	@cp $(DIST_BIN_DIR)/$(TARGET) $(PUBLISH_BIN_DIR)/
 	@cp $(DIST_LIB_DIR)/$(LIB_TARGET) $(PUBLISH_LIB_DIR)/
 	@cp $(HEADERS) $(PUBLISH_INCLUDE_DIR)/
 	@cp $(DIST_SHARE_DIR)/*.conf $(PUBLISH_SHARE_DIR)/
-	@echo "📋 Creating archive..."
+	@echo "📋 Creating archive..." | tee -a $(LOG_FILE)
 	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz bin/ lib/ include/ share/
-	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz"
+	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz" | tee -a $(LOG_FILE)
 
 $(PUBLISH_BIN_DIR):
 	@mkdir -p $(PUBLISH_BIN_DIR)
@@ -362,6 +379,7 @@ clean-full:
 	@rm -rf $(DIST_DIR)
 	@rm -rf $(PUBLISH_DIR)
 	@rm -rf $(ARTIFACTS_DIR)
+	@rm -rf $(LOGS_DIR)
 	@rm -f .env
 	@echo "✅ Full cleanup completed!"
 
@@ -388,14 +406,15 @@ help:
 	@echo "  install-lib      - Install only library and headers to system"
 	@echo "  publish          - Create a distributable package with bin, lib, include, and share files"
 	@echo "  uninstall        - Remove from system"
-	@echo "  clean            - Remove build artifacts (keeps artifacts/ and .env files)"
-	@echo "  clean-full       - Remove all artifacts including artifacts/ and .env files"
+	@echo "  clean            - Remove build artifacts (keeps artifacts/, logs/ and .env files)"
+	@echo "  clean-full       - Remove all artifacts including artifacts/, logs/ and .env files"
 	@echo "  version          - Display current version"
 	@echo "  patch            - Bump patch version (x.y.z -> x.y.z+1)"
 	@echo "  minor            - Bump minor version (x.y.z -> x.y+1.0)"
 	@echo "  major            - Bump major version (x.y.z -> x+1.0.0)"
 	@echo "  help             - Show this help"
 	@echo ""
+	@echo "📝 Build logs are written to: ./logs/<iso-datetime-utc>.log"
 	@echo "🖥️  Detected OS: $(OS_NAME)"
 	@echo "🔗 OpenGL flags: $(GLFLAG)"
 	@echo "📦 SDL2 flags: $(SDL2_CFLAGS) $(SDL2_LIBS)"

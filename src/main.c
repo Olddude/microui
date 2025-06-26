@@ -2,7 +2,6 @@
 #include "server.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define CLIENT_COMMAND "client"
@@ -32,33 +31,25 @@ int main(int argc, char **argv, char **envp) {
             HELP_COMMAND
         );
         fprintf(stderr, "Run '%s %s' for more information.\n", argv[0], HELP_COMMAND);
-        return EXIT_FAILURE;
+        return 1;
     }
 
     const char *command = argv[1];
 
     if (strcmp(command, HELP_COMMAND) == 0) {
         print_help(argv[0]);
-        return EXIT_SUCCESS;
+        return 1;
     }
 
     if (strcmp(command, CLIENT_COMMAND) == 0) {
-        if (client_run(argc, argv, envp) != 0) {
-            fprintf(stderr, "Failed to run client command.\n");
-            return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
+        return client_run(argc, argv, envp, NULL, NULL);
     }
 
     if (strcmp(command, SERVER_COMMAND) == 0) {
-        if (server_run(argc, argv, envp) != 0) {
-            fprintf(stderr, "Failed to run server command.\n");
-            return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
+        return server_run(argc, argv, envp, NULL, NULL);
     }
 
     fprintf(stderr, "Error: Unknown command '%s'\n", command);
     fprintf(stderr, "Run '%s %s' for available commands.\n", argv[0], HELP_COMMAND);
-    return EXIT_FAILURE;
+    return 1;
 }
