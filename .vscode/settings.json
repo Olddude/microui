@@ -43,6 +43,8 @@
     "allproxy_server.h": "c",
     "stdbool.h": "c",
     "*.conf": "ini",
-    "renderer.h": "c"
+    "renderer.h": "c",
+    "condition_variable": "c",
+    "stop_token": "c"
   }
 }

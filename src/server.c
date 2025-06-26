@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 // Example server handler callbacks
 static void server_init_callback(int argc, char **argv, char **envp, execution_context_t *ctx) {
@@ -23,10 +24,41 @@ static void server_bind_callback(int argc, char **argv, char **envp, execution_c
 
 static void server_listen_callback(int argc, char **argv, char **envp, execution_context_t *ctx) {
     printf("Server: Listening for connections...\n");
-    if (console_run(argc, argv, envp) != 0) {
-        printf("Server: Console operation failed\n");
+
+    // Main server loop - keep running until context is completed (e.g., by signal)
+    int connection_count = 0;
+    while (!ctx->completed) {
+        printf("Server: Waiting for client connections... (iteration %d)\n", ++connection_count);
+
+        // Try to run console operations, but don't fail if they don't work
+        int console_result = console_run(argc, argv, envp);
+        if (console_result == 0) {
+            printf("Server: Console operation successful\n");
+        }
+        else {
+            printf("Server: Console operation returned %d (continuing anyway)\n", console_result);
+        }
+
+        // Simulate handling a connection
+        printf("Server: Processing simulated client request #%d\n", connection_count);
+
+        // Small delay to prevent busy waiting and allow signal handling
+        usleep(500000); // 500ms
+
+        // Check if we should continue (could be interrupted by signal)
+        if (ctx->completed) {
+            printf("Server: Received shutdown signal, stopping gracefully...\n");
+            break;
+        }
+
+        // Limit iterations for demo purposes
+        if (connection_count >= 10) {
+            printf("Server: Reached maximum iterations, stopping...\n");
+            break;
+        }
     }
-    (void) ctx;
+
+    printf("Server: Stopped listening after %d connections\n", connection_count);
 }
 
 static void
