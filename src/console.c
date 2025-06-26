@@ -27,7 +27,7 @@ static void console_args_free(ConsoleArgs args) {
     }
 }
 
-static int console_command_run(int argc, char **argv, char **envp) {
+int console_command_run(int argc, char **argv, char **envp) {
     ConsoleArgs args = console_args_parse(argc, argv, envp);
     if (!args.is_valid) {
         fprintf(stderr, "Invalid command line arguments\n");

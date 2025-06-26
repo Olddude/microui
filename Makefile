@@ -61,12 +61,6 @@ DIST_TEST_DIR = $(DIST_DIR)/test
 DIST_SHARE_DIR = $(DIST_DIR)/share
 DIST_INCLUDE_DIR = $(DIST_DIR)/include
 
-PUBLISH_DIR = publish
-PUBLISH_BIN_DIR = $(PUBLISH_DIR)/bin
-PUBLISH_LIB_DIR = $(PUBLISH_DIR)/lib
-PUBLISH_SHARE_DIR = $(PUBLISH_DIR)/share
-PUBLISH_INCLUDE_DIR = $(PUBLISH_DIR)/include
-
 ARTIFACTS_DIR = artifacts
 
 # Logging configuration
@@ -105,9 +99,8 @@ TEST_LIBS = ""
 	test-integration \
 	test-performance \
 	install \
-	install-lib \
 	uninstall \
-	publish \
+	package \
 	clean \
 	clean-full \
 	help \
@@ -196,15 +189,46 @@ $(DIST_BIN_DIR)/$(TARGET): $(OBJ_FILES) $(MAIN_OBJ_FILE) | $(DIST_BIN_DIR) $(LOG
 	$(CC) $(OBJ_FILES) $(MAIN_OBJ_FILE) -o $@ $(LDFLAGS) 2>&1 | tee -a $(LOG_FILE)
 	@echo "✅ Built executable $(TARGET) successfully" | tee -a $(LOG_FILE)
 
+# Ensure all object files are built before creating the library
 $(DIST_LIB_DIR)/$(LIB_TARGET): $(OBJ_FILES) | $(DIST_LIB_DIR) $(LOGS_DIR)
 	@echo "📚 Creating static library $(LIB_TARGET)..." | tee -a $(LOG_FILE)
 	@echo "   Archive: $(notdir $(OBJ_FILES))" | tee -a $(LOG_FILE)
+	@ls -la $(DIST_OBJ_DIR)/ | tee -a $(LOG_FILE)
 	$(AR) rcs $@ $(OBJ_FILES) 2>&1 | tee -a $(LOG_FILE)
 	@echo "✅ Built static library $(LIB_TARGET) successfully" | tee -a $(LOG_FILE)
 
-$(DIST_OBJ_DIR)/%.o: src/%.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
-	@echo "🔨 Compiling $< → $(notdir $@)" | tee -a $(LOG_FILE)
-	$(CC) $(CFLAGS) -c $< -o $@ 2>&1 | tee -a $(LOG_FILE)
+# Compile individual source files to object files
+$(DIST_OBJ_DIR)/core.o: src/core.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/core.c → core.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/core.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/microui.o: src/microui.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/microui.c → microui.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/microui.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/renderer.o: src/renderer.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/renderer.c → renderer.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/renderer.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/client.o: src/client.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/client.c → client.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/client.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/server.o: src/server.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/server.c → server.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/server.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/window.o: src/window.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/window.c → window.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/window.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/console.o: src/console.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/console.c → console.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/console.c -o $@ 2>&1 | tee -a $(LOG_FILE)
+
+$(DIST_OBJ_DIR)/main.o: src/main.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
+	@echo "🔨 Compiling src/main.c → main.o" | tee -a $(LOG_FILE)
+	$(CC) $(CFLAGS) -c src/main.c -o $@ 2>&1 | tee -a $(LOG_FILE)
 
 test-unit: $(DIST_TEST_DIR)/unit_tests share | $(LOGS_DIR)
 	@echo "🧪 Running unit tests..." | tee -a $(LOG_FILE)
@@ -253,52 +277,43 @@ tree: | $(DIST_DIR)
 	@tree ./dist -L 7 2>/dev/null || (echo "📂 tree command not available, using ls -la:" && find ./dist -type d | head -20)
 
 $(DIST_BIN_DIR):
+	@echo "📁 Creating directory $(DIST_BIN_DIR)"
 	@mkdir -p $(DIST_BIN_DIR)
 
 $(DIST_LIB_DIR):
+	@echo "📁 Creating directory $(DIST_LIB_DIR)"
 	@mkdir -p $(DIST_LIB_DIR)
 
 $(DIST_OBJ_DIR):
+	@echo "📁 Creating directory $(DIST_OBJ_DIR)"
 	@mkdir -p $(DIST_OBJ_DIR)
 
 $(DIST_TEST_DIR):
+	@echo "📁 Creating directory $(DIST_TEST_DIR)"
 	@mkdir -p $(DIST_TEST_DIR)
 
 $(DIST_SHARE_DIR):
+	@echo "📁 Creating directory $(DIST_SHARE_DIR)"
 	@mkdir -p $(DIST_SHARE_DIR)
 
 $(DIST_INCLUDE_DIR):
+	@echo "📁 Creating directory $(DIST_INCLUDE_DIR)"
 	@mkdir -p $(DIST_INCLUDE_DIR)
 
 $(LOGS_DIR):
+	@echo "📁 Creating directory $(LOGS_DIR)"
 	@mkdir -p $(LOGS_DIR)
 
-publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(PUBLISH_BIN_DIR) $(PUBLISH_LIB_DIR) $(PUBLISH_SHARE_DIR) $(PUBLISH_INCLUDE_DIR) $(ARTIFACTS_DIR) $(LOGS_DIR)
-	@echo "📦 Preparing publish package..." | tee -a $(LOG_FILE)
-	@cp $(DIST_BIN_DIR)/$(TARGET) $(PUBLISH_BIN_DIR)/
-	@cp $(DIST_LIB_DIR)/$(LIB_TARGET) $(PUBLISH_LIB_DIR)/
-	@cp $(HEADERS) $(PUBLISH_INCLUDE_DIR)/
-	@cp -r $(DIST_SHARE_DIR)/* $(PUBLISH_SHARE_DIR)/
+package: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(ARTIFACTS_DIR) $(LOGS_DIR)
+	@echo "📦 Creating package..." | tee -a $(LOG_FILE)
 	@echo "📋 Creating archive..." | tee -a $(LOG_FILE)
-	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz bin/ lib/ include/ share/
-	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz" | tee -a $(LOG_FILE)
-
-$(PUBLISH_BIN_DIR):
-	@mkdir -p $(PUBLISH_BIN_DIR)
-
-$(PUBLISH_LIB_DIR):
-	@mkdir -p $(PUBLISH_LIB_DIR)
-
-$(PUBLISH_SHARE_DIR):
-	@mkdir -p $(PUBLISH_SHARE_DIR)
-
-$(PUBLISH_INCLUDE_DIR):
-	@mkdir -p $(PUBLISH_INCLUDE_DIR)
+	@cd $(DIST_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz bin/ lib/ include/ share/
+	@echo "✅ Package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz" | tee -a $(LOG_FILE)
 
 $(ARTIFACTS_DIR):
 	@mkdir -p $(ARTIFACTS_DIR)
 
-install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET)
+install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 	@echo "📥 Installing to $(PREFIX)..."
 	@install -d $(DESTDIR)$(BIN_DIR)
 	@install -d $(DESTDIR)$(LIB_DIR)
@@ -308,23 +323,13 @@ install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET)
 	@install -m 755 $(DIST_BIN_DIR)/$(TARGET) $(DESTDIR)$(BIN_DIR)/
 	@install -m 644 $(DIST_LIB_DIR)/$(LIB_TARGET) $(DESTDIR)$(LIB_DIR)/
 	@install -m 644 $(HEADERS) $(DESTDIR)$(INCLUDE_DIR)/
-	@cp -r share/* $(DESTDIR)$(SHARE_DIR)/
+	@cp -r $(DIST_SHARE_DIR)/* $(DESTDIR)$(SHARE_DIR)/
 	@echo "✅ Installation completed!"
 	@echo "📁 Binary: $(BIN_DIR)/$(TARGET)"
 	@echo "📁 Library: $(LIB_DIR)/$(LIB_TARGET)"
 	@echo "📁 Headers: $(INCLUDE_DIR)/"
 	@echo "📁 Config: $(SHARE_DIR)/"
 	@echo "📁 Logs: $(LOG_DIR)/"
-
-install-lib: $(DIST_LIB_DIR)/$(LIB_TARGET)
-	@echo "📚 Installing library to $(PREFIX)..."
-	@install -d $(DESTDIR)$(LIB_DIR)
-	@install -d $(DESTDIR)$(INCLUDE_DIR)
-	@install -m 644 $(DIST_LIB_DIR)/$(LIB_TARGET) $(DESTDIR)$(LIB_DIR)/
-	@install -m 644 $(HEADERS) $(DESTDIR)$(INCLUDE_DIR)/
-	@echo "✅ Library installation completed!"
-	@echo "📁 Library: $(LIB_DIR)/$(LIB_TARGET)"
-	@echo "📁 Headers: $(INCLUDE_DIR)/"
 
 uninstall:
 	@echo "🗑️  Uninstalling from $(PREFIX)..."
@@ -371,13 +376,11 @@ major:
 clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@rm -rf $(DIST_DIR)
-	@rm -rf $(PUBLISH_DIR)
 	@echo "✅ Cleanup completed!"
 
 clean-full:
 	@echo "🧹 Cleaning all artifacts and environment files..."
 	@rm -rf $(DIST_DIR)
-	@rm -rf $(PUBLISH_DIR)
 	@rm -rf $(ARTIFACTS_DIR)
 	@rm -rf $(LOGS_DIR)
 	@rm -f .env
@@ -403,9 +406,8 @@ help:
 	@echo "  test-unit        - Run unit tests"
 	@echo "  test-integration - Run integration tests"
 	@echo "  test-performance - Run performance tests"
-	@echo "  install          - Install binary and library to system (use PREFIX=path to customize)"
-	@echo "  install-lib      - Install only library and headers to system"
-	@echo "  publish          - Create a distributable package with bin, lib, include, and share files"
+	@echo "  install          - Install binary, library, headers, and config files to system (use PREFIX=path to customize)"
+	@echo "  package          - Create a distributable tar.gz package"
 	@echo "  uninstall        - Remove from system"
 	@echo "  clean            - Remove build artifacts (keeps artifacts/, logs/ and .env files)"
 	@echo "  clean-full       - Remove all artifacts including artifacts/, logs/ and .env files"

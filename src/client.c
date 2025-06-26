@@ -49,7 +49,7 @@ static void client_add_middleware(execution_context_t *ctx, callback_t middlewar
 }
 
 // Enhanced client run with execution context
-static int client_command_run(int argc, char **argv, char **envp) {
+int client_command_run(int argc, char **argv, char **envp) {
     execution_context_t *ctx = client_create_context(EXEC_SEQUENTIAL);
     if (!ctx) {
         return 1;

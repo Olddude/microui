@@ -89,7 +89,7 @@ static void server_add_handler(execution_context_t *ctx, callback_t handler) {
 }
 
 // Enhanced server run with execution context
-static int server_command_run(int argc, char **argv, char **envp) {
+int server_command_run(int argc, char **argv, char **envp) {
     execution_context_t *ctx = server_create_context(EXEC_PARALLEL);
     if (!ctx) {
         return 1;
