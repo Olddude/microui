@@ -75,7 +75,6 @@ execution_context_t *create_context(execution_strategy_t strategy);
 execution_context_t *
 create_context_with_args(execution_strategy_t strategy, int argc, char **argv, char **envp);
 void set_context_args(execution_context_t *ctx, int argc, char **argv, char **envp);
-callback_chain_t *create_chain(callback_t callback);
 void destroy_context(execution_context_t *ctx);
 
 #endif // CORE_H

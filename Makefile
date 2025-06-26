@@ -1,6 +1,6 @@
 # Microui Build System
 
-VERSION = $(shell grep '^version' microui.conf 2>/dev/null | cut -d' ' -f2 || echo "latest")
+VERSION = $(shell grep -o '"version":\s*"[^"]*"' share/config/microui.config.json 2>/dev/null | grep -o '"[^"]*"$$' | tr -d '"' || echo "latest")
 PREFIX ?= $(shell pwd)/.local
 BUILD_TYPE ?= Release
 
@@ -88,8 +88,6 @@ MAIN_OBJ_FILE = $(addprefix $(DIST_OBJ_DIR)/, $(notdir $(MAIN_OBJ)))
 TEST_SOURCES = tests/integration_tests.c tests/unit_tests.c tests/performance_tests.c
 TEST_TARGETS = $(DIST_TEST_DIR)/integration_tests $(DIST_TEST_DIR)/unit_tests $(DIST_TEST_DIR)/performance_tests
 TEST_LIBS = ""
-
-SHARE_FILES = microui.conf
 
 .PHONY: \
 	all \
@@ -183,7 +181,7 @@ endif
 
 share: | $(DIST_SHARE_DIR) $(LOGS_DIR)
 	@echo "⚙️  Configuring project..." | tee -a $(LOG_FILE)
-	@cp microui.conf $(DIST_SHARE_DIR)/
+	@cp -r share/* $(DIST_SHARE_DIR)/
 	@echo "✅ Configuration files copied to $(DIST_SHARE_DIR)/" | tee -a $(LOG_FILE)
 
 headers: | $(DIST_INCLUDE_DIR) $(LOGS_DIR)
@@ -278,7 +276,7 @@ publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share |
 	@cp $(DIST_BIN_DIR)/$(TARGET) $(PUBLISH_BIN_DIR)/
 	@cp $(DIST_LIB_DIR)/$(LIB_TARGET) $(PUBLISH_LIB_DIR)/
 	@cp $(HEADERS) $(PUBLISH_INCLUDE_DIR)/
-	@cp $(DIST_SHARE_DIR)/*.conf $(PUBLISH_SHARE_DIR)/
+	@cp -r $(DIST_SHARE_DIR)/* $(PUBLISH_SHARE_DIR)/
 	@echo "📋 Creating archive..." | tee -a $(LOG_FILE)
 	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz bin/ lib/ include/ share/
 	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz" | tee -a $(LOG_FILE)
@@ -308,7 +306,7 @@ install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET)
 	@install -m 755 $(DIST_BIN_DIR)/$(TARGET) $(DESTDIR)$(BIN_DIR)/
 	@install -m 644 $(DIST_LIB_DIR)/$(LIB_TARGET) $(DESTDIR)$(LIB_DIR)/
 	@install -m 644 $(HEADERS) $(DESTDIR)$(INCLUDE_DIR)/
-	@install -m 644 microui.conf $(DESTDIR)$(SHARE_DIR)/
+	@cp -r share/* $(DESTDIR)$(SHARE_DIR)/
 	@echo "✅ Installation completed!"
 	@echo "📁 Binary: $(BIN_DIR)/$(TARGET)"
 	@echo "📁 Library: $(LIB_DIR)/$(LIB_TARGET)"
@@ -340,32 +338,32 @@ version:
 
 patch:
 	@echo "🔧 Bumping patch version..."
-	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
+	@current_version=$$(grep -o '"version":\s*"[^"]*"' share/config/microui.config.json | grep -o '"[^"]*"$$' | tr -d '"'); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	minor=$$(echo $$current_version | cut -d. -f2); \
 	patch=$$(echo $$current_version | cut -d. -f3); \
 	new_patch=$$((patch + 1)); \
 	new_version="$$major.$$minor.$$new_patch"; \
-	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
+	sed -i.bak "s/\"version\":\s*\"[^\"]*\"/\"version\": \"$$new_version\"/" share/config/microui.config.json && rm share/config/microui.config.json.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 minor:
 	@echo "🔧 Bumping minor version..."
-	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
+	@current_version=$$(grep -o '"version":\s*"[^"]*"' share/config/microui.config.json | grep -o '"[^"]*"$$' | tr -d '"'); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	minor=$$(echo $$current_version | cut -d. -f2); \
 	new_minor=$$((minor + 1)); \
 	new_version="$$major.$$new_minor.0"; \
-	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
+	sed -i.bak "s/\"version\":\s*\"[^\"]*\"/\"version\": \"$$new_version\"/" share/config/microui.config.json && rm share/config/microui.config.json.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 major:
 	@echo "🔧 Bumping major version..."
-	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
+	@current_version=$$(grep -o '"version":\s*"[^"]*"' share/config/microui.config.json | grep -o '"[^"]*"$$' | tr -d '"'); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	new_major=$$((major + 1)); \
 	new_version="$$new_major.0.0"; \
-	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
+	sed -i.bak "s/\"version\":\s*\"[^\"]*\"/\"version\": \"$$new_version\"/" share/config/microui.config.json && rm share/config/microui.config.json.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 clean:

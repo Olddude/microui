@@ -6,8 +6,6 @@
 
 // Enhanced server functions using execution context
 int server_run(int argc, char **argv, char **envp, callback_t success, callback_t failure);
-execution_context_t *server_create_context(execution_strategy_t strategy);
-void server_add_handler(execution_context_t *ctx, callback_t handler);
 void server_execute_parallel(execution_context_t *ctx, int argc, char **argv, char **envp);
 
 // Legacy compatibility

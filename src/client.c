@@ -29,6 +29,23 @@ static void client_process_callback(int argc, char **argv, char **envp, executio
     (void) ctx;
 }
 
+// Create a client-specific execution context
+static execution_context_t *client_create_context(execution_strategy_t strategy) {
+    execution_context_t *ctx = create_context(strategy);
+    if (!ctx)
+        return NULL;
+
+    // Client-specific configuration could go here
+    return ctx;
+}
+
+// Add middleware to client context
+static void client_add_middleware(execution_context_t *ctx, callback_t middleware) {
+    if (ctx && middleware) {
+        ctx->subscribe(ctx, middleware);
+    }
+}
+
 // Enhanced client run with execution context
 int client_run(int argc, char **argv, char **envp, callback_t success, callback_t failure) {
     execution_context_t *ctx = client_create_context(EXEC_SEQUENTIAL);
@@ -55,23 +72,6 @@ int client_run(int argc, char **argv, char **envp, callback_t success, callback_
     int result = ctx->completed ? 0 : -1;
     destroy_context(ctx);
     return result;
-}
-
-// Create a client-specific execution context
-static execution_context_t *client_create_context(execution_strategy_t strategy) {
-    execution_context_t *ctx = create_context(strategy);
-    if (!ctx)
-        return NULL;
-
-    // Client-specific configuration could go here
-    return ctx;
-}
-
-// Add middleware to client context
-static void client_add_middleware(execution_context_t *ctx, callback_t middleware) {
-    if (ctx && middleware) {
-        ctx->subscribe(ctx, middleware);
-    }
 }
 
 // Execute client context asynchronously

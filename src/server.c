@@ -64,6 +64,28 @@ server_handle_request_callback(int argc, char **argv, char **envp, execution_con
     (void) ctx;
 }
 
+// Create a server-specific execution context
+static execution_context_t *server_create_context(execution_strategy_t strategy) {
+    execution_context_t *ctx = create_context(strategy);
+    if (!ctx)
+        return NULL;
+
+    // Server-specific configuration
+    // Default to parallel execution for handling multiple connections
+    if (strategy == EXEC_SEQUENTIAL) {
+        ctx->switch_strategy(ctx, EXEC_PARALLEL);
+    }
+
+    return ctx;
+}
+
+// Add handler to server context
+static void server_add_handler(execution_context_t *ctx, callback_t handler) {
+    if (ctx && handler) {
+        ctx->subscribe(ctx, handler);
+    }
+}
+
 // Enhanced server run with execution context
 int server_run(int argc, char **argv, char **envp, callback_t success, callback_t failure) {
     execution_context_t *ctx = server_create_context(EXEC_PARALLEL);
@@ -91,28 +113,6 @@ int server_run(int argc, char **argv, char **envp, callback_t success, callback_
     int result = ctx->completed ? 0 : -1;
     destroy_context(ctx);
     return result;
-}
-
-// Create a server-specific execution context
-static execution_context_t *server_create_context(execution_strategy_t strategy) {
-    execution_context_t *ctx = create_context(strategy);
-    if (!ctx)
-        return NULL;
-
-    // Server-specific configuration
-    // Default to parallel execution for handling multiple connections
-    if (strategy == EXEC_SEQUENTIAL) {
-        ctx->switch_strategy(ctx, EXEC_PARALLEL);
-    }
-
-    return ctx;
-}
-
-// Add handler to server context
-static void server_add_handler(execution_context_t *ctx, callback_t handler) {
-    if (ctx && handler) {
-        ctx->subscribe(ctx, handler);
-    }
 }
 
 // Execute server context with parallel handlers
