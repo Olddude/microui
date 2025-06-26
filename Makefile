@@ -1,5 +1,6 @@
 # Microui Build System
 
+VERSION ?= $(shell cat .version 2>/dev/null || echo "dev")
 PREFIX ?= /usr/local
 PATH ?= /usr/local/bin:$(PATH)
 BUILD_TYPE ?= Release
@@ -298,7 +299,7 @@ uninstall:
 
 # Version management targets
 version:
-	@echo "$(shell cat .version)"
+	@echo "$(VERSION)"
 
 patch:
 	@echo "🔧 Bumping patch version..."
