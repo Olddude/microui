@@ -34,35 +34,35 @@ jobs:
             ${{ runner.os }}-apt-
 
       - name: Install dev dependencies
-        run: sudo ./scripts/dependencies_dev.sh
+        run: sudo ./scripts/make.sh dev-dependencies
 
       - name: Install dependencies
-        run: sudo ./scripts/dependencies.sh
+        run: sudo ./scripts/make.sh dependencies
 
       - name: Check
-        run: ./scripts/check.sh
+        run: ./scripts/make.sh check
 
       - name: Lint
-        run: ./scripts/lint.sh
+        run: ./scripts/make.sh lint
 
       - name: Build
-        run: ./scripts/build_release.sh
+        run: ./scripts/make.sh release
 
       - name: Unit tests
-        run: ./scripts/test_unit.sh
+        run: ./scripts/make.sh test-unit
 
       - name: Integration tests
-        run: ./scripts/test_integration.sh
+        run: ./scripts/make.sh test-integration
 
       - name: Performance tests
-        run: ./scripts/test_performance.sh
+        run: ./scripts/make.sh test-performance
 
       - name: Install
-        run: ./scripts/install.sh
+        run: ./scripts/make.sh install
 
       - name: Set VERSION
         run: |
-          VERSION=$(./scripts/version.sh)
+          VERSION=$(./scripts/make.sh version)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Set BUILD_NUMBER
@@ -105,7 +105,7 @@ jobs:
 
       - name: Set VERSION
         run: |
-          VERSION=$(./scripts/version.sh)
+          VERSION=$(./scripts/make.sh version)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Set BUILD_NUMBER
