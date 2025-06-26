@@ -8,10 +8,10 @@ typedef struct
 {
     char *input;
     bool is_valid;
-} ConsoleArgs;
+} console_args_t;
 
-static ConsoleArgs console_args_parse(int argc, char **argv, char **envp) {
-    ConsoleArgs args = {NULL, false};
+static console_args_t console_args_parse(int argc, char **argv, char **envp) {
+    console_args_t args = {NULL, false};
     if (argc > 1) {
         args.input = strdup(argv[1]);
         args.is_valid = true;
@@ -19,14 +19,14 @@ static ConsoleArgs console_args_parse(int argc, char **argv, char **envp) {
     return args;
 }
 
-static void console_args_free(ConsoleArgs args) {
+static void console_args_free(console_args_t args) {
     if (args.input) {
         free(args.input);
     }
 }
 
 int console_command_run(int argc, char **argv, char **envp) {
-    ConsoleArgs args = console_args_parse(argc, argv, envp);
+    console_args_t args = console_args_parse(argc, argv, envp);
     if (!args.is_valid) {
         fprintf(stderr, "Invalid command line arguments\n");
         return 1;
