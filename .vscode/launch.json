@@ -1,23 +1,32 @@
 {
   "version": "0.2.0",
-  "inputs": [
-    {
-      "id": "target",
-      "type": "promptString",
-      "description": "Enter the target",
-      "default": ""
-    }
-  ],
   "configurations": [
     {
       "type": "lldb",
       "request": "launch",
-      "name": "[Debug] Source",
+      "name": "[Debug] Client",
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/bin/microui",
       "args": [
         "client",
+        "-c",
+        "${workspaceFolder}/config/default.microui.conf",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] Server",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/bin/microui",
+      "args": [
+        "server",
         "-c",
         "${workspaceFolder}/config/default.microui.conf",
         "-l",
@@ -45,10 +54,26 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "[Debug] Source",
+      "name": "[Debug] IntegrationTests",
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/dist/test/unit_tests",
+      "program": "${workspaceFolder}/dist/test/integration_tests",
+      "args": [
+        "-c",
+        "${workspaceFolder}/config/default.microui.conf",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] PerformanceTests",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/test/performance_tests",
       "args": [
         "-c",
         "${workspaceFolder}/config/default.microui.conf",

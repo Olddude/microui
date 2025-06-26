@@ -1,7 +1,13 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
+
+// static int shutdown_requested = 0;
 
 int server_run(int argc, char **argv, char **envp) {
-    printf("server_run is not implemented\n");
-    return EXIT_FAILURE;
+    // while (!shutdown_requested) {
+    //     sleep(1);
+    //     printf("Server is running...\n");
+    // }
+    printf("Server started...\n");
+    return 0;
 }
