@@ -1,13 +1,13 @@
 {
-  "$schema": "./microui-config.schema.json",
-  "name": "Default MicroUI Configuration",
-  "description": "Standard configuration for MicroUI applications with windowed client and console server",
+  "$schema": "../schema/microui-config.schema.json",
+  "name": "microui",
+  "description": "A *tiny*, portable, immediate-mode app in ANSI C",
   "version": "0.1.0",
   "client": {
     "mode": "window",
     "width": 1440,
     "height": 900,
-    "title": "MicroUI Application",
+    "title": "MicroUI Client",
     "resizable": true,
     "vsync": true,
     "fps_limit": 60
