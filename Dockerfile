@@ -10,12 +10,12 @@ COPY tests/ ./tests/
 COPY Makefile ./Makefile
 RUN ./scripts/install-dev-dependencies.sh
 RUN ./scripts/install-dependencies.sh
-RUN ./scripts/make.sh release
+RUN make release
 
 FROM ubuntu:22.04 AS runtime
 WORKDIR /app
 COPY --from=build /app/dist/ ./dist/
-COPY scripts/install-dependencies.sh ./scripts/install-dependencies.sh
+COPY scripts/ ./scripts/
 RUN ./scripts/install-dependencies.sh
 RUN rm -rf ./scripts
 ENTRYPOINT [ "./dist/bin/microui" ]
