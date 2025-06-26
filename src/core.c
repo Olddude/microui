@@ -1,3 +1,6 @@
+#define _POSIX_C_SOURCE 200809L
+#define _GNU_SOURCE
+
 #include "core.h"
 #include <pthread.h>
 #include <signal.h>

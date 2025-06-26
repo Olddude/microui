@@ -88,7 +88,6 @@ TEST_LIBS = ""
 	lib \
 	debug \
 	release \
-	static \
 	dependencies \
 	dev-dependencies \
 	share \
@@ -124,17 +123,6 @@ debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $
 release: CFLAGS += $(RELEASE_FLAGS)
 release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(LOGS_DIR)
 	@echo "🚀 Release build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
-
-static: | $(LOGS_DIR)
-	@echo "🔗 Building with static linking for $(OS_NAME)..." | tee -a $(LOG_FILE)
-ifeq ($(OS_NAME),Msys)
-	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lopengl32 -lm -lwinmm -lole32 -loleaut32 -limm32 -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
-else ifeq ($(OS_NAME),Darwin)
-	$(MAKE) LDFLAGS="/opt/homebrew/lib/libSDL2.a /opt/homebrew/lib/libSDL2main.a -framework OpenGL -framework CoreGraphics -framework CoreServices -framework ForceFeedback -framework Cocoa -framework Carbon -framework IOKit -framework CoreAudio -framework CoreFoundation -framework CoreHaptics -framework GameController -framework Metal -framework AudioToolbox -framework AVFoundation -framework CoreVideo -framework QuartzCore -lm -liconv" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
-else
-	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lGL -lm -lpthread -ldl -lasound -lpulse -lX11 -lXext -lXcursor -lXinerama -lXi -lXrandr -lXss -lXxf86vm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share 2>&1 | tee -a $(LOG_FILE)
-endif
-	@echo "🔗 Static build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
 
 dev-dependencies:
 	@echo "🛠️  Installing development dependencies for $(OS_NAME)..."
@@ -394,7 +382,6 @@ help:
 	@echo "  lib              - Build only the static library (without main.c)"
 	@echo "  debug            - Build with debug symbols"
 	@echo "  release          - Build with release optimizations"
-	@echo "  static           - Build with static linking (no SDL2 runtime dependencies)"
 	@echo "  dependencies     - Install system dependencies (SDL2)"
 	@echo "  dev-dependencies - Install development tools (build-essential, clang-format, cppcheck)"
 	@echo "  share            - Copy configuration files to dist directory"
