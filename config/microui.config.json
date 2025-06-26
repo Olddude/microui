@@ -1,5 +1,5 @@
 {
-  "$schema": "https://github.com/Olddude/microui/schemas/microui-config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/Olddude/microui/refs/heads/feature/myui/schemas/microui-config.schema.json",
   "version": "0.1.0",
   "client": {
     "mode": "window",

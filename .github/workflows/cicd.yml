@@ -2,10 +2,8 @@ name: CI/CD Pipeline
 
 env:
   PROJECT_NAME: "microui"
-  BUILD_DIR: "${{ github.workspace }}/build"
-  CMAKE_BUILD_TYPE: "Release"
-  CMAKE_PREFIX_PATH: "${{ github.workspace }}/dist"
-  CMAKE_INSTALL_PREFIX: "${{ github.workspace }}/dist"
+  BUILD_TYPE: "Release"
+  PREFIX: "${{ github.workspace }}/.local"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
   IMAGE_DESCRIPTION: "MICROUI"
@@ -35,7 +33,7 @@ jobs:
             ${{ runner.os }}-apt-xorg-
             ${{ runner.os }}-apt-
 
-      - name: Install build dependencies
+      - name: Install dev dependencies
         run: make dev-dependencies
 
       - name: Install dependencies
@@ -58,6 +56,9 @@ jobs:
 
       - name: Performance tests
         run: make test-performance
+
+      - name: Install
+        run: make install
 
       - name: Set VERSION
         run: |
