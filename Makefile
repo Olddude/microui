@@ -88,6 +88,7 @@ SHARE_FILES = microui.conf
 	lib \
 	debug \
 	release \
+	static \
 	deps \
 	dependencies \
 	dev-dependencies \
@@ -108,7 +109,8 @@ SHARE_FILES = microui.conf
 	version \
 	patch \
 	minor \
-	major
+	major \
+	ldd
 
 all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 
@@ -119,6 +121,16 @@ debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 
 release: CFLAGS += $(RELEASE_FLAGS)
 release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+
+static:
+	@echo "🔗 Building with static linking for $(OS_NAME)..."
+ifeq ($(OS_NAME),Msys)
+	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lopengl32 -lm -lwinmm -lole32 -loleaut32 -limm32 -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+else ifeq ($(OS_NAME),Darwin)
+	$(MAKE) LDFLAGS="/opt/homebrew/lib/libSDL2.a /opt/homebrew/lib/libSDL2main.a -framework OpenGL -framework CoreGraphics -framework CoreServices -framework ForceFeedback -framework Cocoa -framework Carbon -framework IOKit -framework CoreAudio -framework CoreFoundation -framework CoreHaptics -framework GameController -framework Metal -framework AudioToolbox -framework AVFoundation -framework CoreVideo -framework QuartzCore -lm -liconv" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+else
+	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lGL -lm -lpthread -ldl -lasound -lpulse -lX11 -lXext -lXcursor -lXinerama -lXi -lXrandr -lXss -lXxf86vm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
+endif
 
 deps: dependencies
 
@@ -219,6 +231,16 @@ check: $(SOURCES) $(HEADERS)
 lint: $(SOURCES) $(HEADERS)
 	@echo "🔍 Checking code style..."
 	@clang-format --dry-run --Werror src/*.c include/*.h tests/*.c
+
+ldd: $(DIST_BIN_DIR)/$(TARGET)
+	@echo "🔍 Checking executable dependencies..."
+ifeq ($(OS_NAME),Darwin)
+	@otool -L $(DIST_BIN_DIR)/$(TARGET)
+else ifeq ($(OS_NAME),Msys)
+	@objdump -p $(DIST_BIN_DIR)/$(TARGET) | grep "DLL Name"
+else
+	@ldd $(DIST_BIN_DIR)/$(TARGET)
+endif
 
 $(DIST_BIN_DIR):
 	@mkdir -p $(DIST_BIN_DIR)
@@ -355,12 +377,14 @@ help:
 	@echo "  lib              - Build only the static library (without main.c)"
 	@echo "  debug            - Build with debug symbols"
 	@echo "  release          - Build with release optimizations"
+	@echo "  static           - Build with static linking (no SDL2 runtime dependencies)"
 	@echo "  deps/dependencies- Install system dependencies (SDL2)"
 	@echo "  dev-dependencies - Install development tools (build-essential, clang-format, cppcheck)"
 	@echo "  share           - Copy configuration files to dist directory"
 	@echo "  headers          - Copy header files to dist directory"
 	@echo "  check            - Run static analysis"
 	@echo "  lint             - Run code style checker"
+	@echo "  ldd              - Check executable dependencies (otool/ldd/objdump)"
 	@echo "  test-unit        - Run unit tests"
 	@echo "  test-integration - Run integration tests"
 	@echo "  test-performance - Run performance tests"
