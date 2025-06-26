@@ -16,7 +16,9 @@ FROM ubuntu:22.04 AS runtime
 WORKDIR /app
 RUN apt-get update -y
 RUN apt-get install -y build-essential make
-COPY ./scripts/ ./scripts/
-RUN ./scripts/make.sh dependencies
 COPY --from=build /app/dist/ ./dist/
+COPY scripts/ ./scripts/
+COPY Makefile ./Makefile
+RUN ./scripts/make.sh dependencies
 ENTRYPOINT [ "./scripts/microui.sh" ]
+CMD ["server"]
