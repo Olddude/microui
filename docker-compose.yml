@@ -8,6 +8,7 @@ services:
     container_name: microui-server
     ports:
       - "8080:8080"
-    command: ["microui", "server"]
+    command: ["server"]
     environment:
-      - name=value
+      PREFIX: "/Users/konstantinnovikov/Source/microui/publish"
+      BUILD_TYPE: "Release"
