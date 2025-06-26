@@ -1,7 +1,7 @@
 # Microui Build System
 
 VERSION = $(shell grep -o '"version":\s*"[^"]*"' share/config/microui.config.json 2>/dev/null | grep -o '"[^"]*"$$' | tr -d '"' || echo "latest")
-PREFIX ?= $(shell pwd)/.local
+PREFIX ?= /usr/local
 BUILD_TYPE ?= Release
 
 # OS Detection

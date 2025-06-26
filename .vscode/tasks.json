@@ -9,8 +9,8 @@
       "options": {
         "cwd": "${workspaceFolder}",
         "env": {
-          "PREFIX": "${workspaceFolder}/.local",
           "PATH": "${workspaceFolder}/dist/bin:${env:PATH}",
+          "PREFIX": "${workspaceFolder}/publish",
           "BUILD_TYPE": "Debug"
         },
         "shell": {
