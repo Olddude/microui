@@ -457,10 +457,9 @@ void mu_set_clip(mu_Context *ctx, mu_Rect rect) {
 }
 
 void mu_draw_rect(mu_Context *ctx, mu_Rect rect, mu_Color color) {
-    mu_Command *cmd;
     rect = intersect_rects(rect, mu_get_clip_rect(ctx));
     if (rect.w > 0 && rect.h > 0) {
-        cmd = mu_push_command(ctx, MU_COMMAND_RECT, sizeof(mu_RectCommand));
+        mu_Command *cmd = mu_push_command(ctx, MU_COMMAND_RECT, sizeof(mu_RectCommand));
         cmd->rect.rect = rect;
         cmd->rect.color = color;
     }
@@ -721,7 +720,7 @@ void mu_update_control(mu_Context *ctx, mu_Id id, mu_Rect rect, int opt) {
 }
 
 void mu_text(mu_Context *ctx, const char *text) {
-    const char *start, *end, *p = text;
+    const char *end, *p = text;
     int width = -1;
     mu_Font font = ctx->style->font;
     mu_Color color = ctx->style->colors[MU_COLOR_TEXT];
@@ -730,7 +729,7 @@ void mu_text(mu_Context *ctx, const char *text) {
     do {
         mu_Rect r = mu_layout_next(ctx);
         int w = 0;
-        start = end = p;
+        const char *start = end = p;
         do {
             const char *word = p;
             while (*p && *p != ' ' && *p != '\n') {

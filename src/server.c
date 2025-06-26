@@ -45,12 +45,6 @@ static void server_listen_callback(int argc, char **argv, char **envp, execution
         // Small delay to prevent busy waiting and allow signal handling
         usleep(500000); // 500ms
 
-        // Check if we should continue (could be interrupted by signal)
-        if (ctx->completed) {
-            printf("Server: Received shutdown signal, stopping gracefully...\n");
-            break;
-        }
-
         // Limit iterations for demo purposes
         if (connection_count >= 10) {
             printf("Server: Reached maximum iterations, stopping...\n");
@@ -100,7 +94,7 @@ int server_run(int argc, char **argv, char **envp, callback_t success, callback_
 }
 
 // Create a server-specific execution context
-execution_context_t *server_create_context(execution_strategy_t strategy) {
+static execution_context_t *server_create_context(execution_strategy_t strategy) {
     execution_context_t *ctx = create_context(strategy);
     if (!ctx)
         return NULL;
@@ -115,7 +109,7 @@ execution_context_t *server_create_context(execution_strategy_t strategy) {
 }
 
 // Add handler to server context
-void server_add_handler(execution_context_t *ctx, callback_t handler) {
+static void server_add_handler(execution_context_t *ctx, callback_t handler) {
     if (ctx && handler) {
         ctx->subscribe(ctx, handler);
     }

@@ -8,7 +8,7 @@
 #define SERVER_COMMAND "server"
 #define HELP_COMMAND "help"
 
-void print_help(const char *program_name) {
+static void print_help(const char *program_name) {
     printf("Usage: %s <command>\n\n", program_name);
     printf("Commands:\n");
     printf("  %s    Run the client\n", CLIENT_COMMAND);

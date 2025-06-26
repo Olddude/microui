@@ -12,7 +12,7 @@ typedef struct
     bool is_valid;
 } ConsoleArgs;
 
-ConsoleArgs console_args_parse(int argc, char **argv, char **envp) {
+static ConsoleArgs console_args_parse(int argc, char **argv, char **envp) {
     ConsoleArgs args = {NULL, false};
     if (argc > 1) {
         args.input = strdup(argv[1]);
@@ -21,7 +21,7 @@ ConsoleArgs console_args_parse(int argc, char **argv, char **envp) {
     return args;
 }
 
-void console_args_free(ConsoleArgs args) {
+static void console_args_free(ConsoleArgs args) {
     if (args.input) {
         free(args.input);
     }

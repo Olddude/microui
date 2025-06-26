@@ -58,7 +58,7 @@ int client_run(int argc, char **argv, char **envp, callback_t success, callback_
 }
 
 // Create a client-specific execution context
-execution_context_t *client_create_context(execution_strategy_t strategy) {
+static execution_context_t *client_create_context(execution_strategy_t strategy) {
     execution_context_t *ctx = create_context(strategy);
     if (!ctx)
         return NULL;
@@ -68,7 +68,7 @@ execution_context_t *client_create_context(execution_strategy_t strategy) {
 }
 
 // Add middleware to client context
-void client_add_middleware(execution_context_t *ctx, callback_t middleware) {
+static void client_add_middleware(execution_context_t *ctx, callback_t middleware) {
     if (ctx && middleware) {
         ctx->subscribe(ctx, middleware);
     }

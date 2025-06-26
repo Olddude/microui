@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void test_callback_1(int argc, char **argv, char **envp, execution_context_t *ctx) {
+static void test_callback_1(int argc, char **argv, char **envp, execution_context_t *ctx) {
     printf("Callback 1 starting (thread: %lu)\n", (unsigned long) pthread_self());
     sleep(1);
     printf("Callback 1 finished\n");
@@ -13,7 +13,7 @@ void test_callback_1(int argc, char **argv, char **envp, execution_context_t *ct
     (void) ctx;
 }
 
-void test_callback_2(int argc, char **argv, char **envp, execution_context_t *ctx) {
+static void test_callback_2(int argc, char **argv, char **envp, execution_context_t *ctx) {
     printf("Callback 2 starting (thread: %lu)\n", (unsigned long) pthread_self());
     sleep(1);
     printf("Callback 2 finished\n");
@@ -23,7 +23,7 @@ void test_callback_2(int argc, char **argv, char **envp, execution_context_t *ct
     (void) ctx;
 }
 
-void test_callback_3(int argc, char **argv, char **envp, execution_context_t *ctx) {
+static void test_callback_3(int argc, char **argv, char **envp, execution_context_t *ctx) {
     printf("Callback 3 starting (thread: %lu)\n", (unsigned long) pthread_self());
     sleep(1);
     printf("Callback 3 finished\n");

@@ -36,7 +36,7 @@ static void *thread_callback_wrapper(void *arg);
 static void signal_handler(int sig);
 static void install_signal_handlers(void);
 static void register_context(execution_context_t *ctx);
-static void unregister_context(execution_context_t *ctx);
+static void unregister_context(const execution_context_t *ctx);
 static void cleanup_all_contexts(void);
 
 // Forward declarations for context methods
@@ -101,7 +101,7 @@ void set_context_args(execution_context_t *ctx, int argc, char **argv, char **en
 }
 
 // Factory function to create callback chain node
-callback_chain_t *create_chain(callback_t callback) {
+static callback_chain_t *create_chain(callback_t callback) {
     callback_chain_t *chain = malloc(sizeof(callback_chain_t));
     if (!chain)
         return NULL;
@@ -335,22 +335,6 @@ static void *thread_callback_wrapper(void *arg) {
 
 // Signal handling implementation
 static void signal_handler(int sig) {
-    const char *signal_name;
-    switch (sig) {
-    case SIGINT:
-        signal_name = "SIGINT";
-        break;
-    case SIGTERM:
-        signal_name = "SIGTERM";
-        break;
-    case SIGABRT:
-        signal_name = "SIGABRT";
-        break;
-    default:
-        signal_name = "Unknown";
-        break;
-    }
-
     // Use write() for async-signal-safe output
     const char msg[] = "\n🛑 Received signal, cleaning up execution contexts...\n";
     write(STDERR_FILENO, msg, sizeof(msg) - 1);
@@ -404,7 +388,7 @@ static void register_context(execution_context_t *ctx) {
     pthread_mutex_unlock(&context_registry_mutex);
 }
 
-static void unregister_context(execution_context_t *ctx) {
+static void unregister_context(const execution_context_t *ctx) {
     if (!ctx)
         return;
 
