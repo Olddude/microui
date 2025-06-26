@@ -207,18 +207,15 @@ $(DIST_OBJ_DIR)/%.o: src/%.c $(HEADERS) | $(DIST_OBJ_DIR) $(LOGS_DIR)
 
 test-unit: $(DIST_TEST_DIR)/unit_tests share | $(LOGS_DIR)
 	@echo "🧪 Running unit tests..." | tee -a $(LOG_FILE)
-	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./unit_tests 2>&1 | tee -a ../$(LOG_FILE)
+	@$(DIST_TEST_DIR)/unit_tests 2>&1 | tee -a $(LOG_FILE)
 
 test-integration: $(DIST_TEST_DIR)/integration_tests share | $(LOGS_DIR)
 	@echo "🔬 Running integration tests..." | tee -a $(LOG_FILE)
-	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./integration_tests 2>&1 | tee -a ../$(LOG_FILE)
+	@$(DIST_TEST_DIR)/integration_tests 2>&1 | tee -a $(LOG_FILE)
 
 test-performance: $(DIST_TEST_DIR)/performance_tests share | $(LOGS_DIR)
 	@echo "⚡ Running performance tests..." | tee -a $(LOG_FILE)
-	@mkdir -p $(DIST_TEST_DIR)
-	@cd $(DIST_TEST_DIR) && ./performance_tests 2>&1 | tee -a ../$(LOG_FILE)
+	@$(DIST_TEST_DIR)/performance_tests 2>&1 | tee -a $(LOG_FILE)
 
 $(DIST_TEST_DIR)/unit_tests: tests/unit_tests.c $(HEADERS) | $(DIST_TEST_DIR) $(LOGS_DIR)
 	@echo "🔨 Building unit tests..." | tee -a $(LOG_FILE)
