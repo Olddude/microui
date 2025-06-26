@@ -115,7 +115,8 @@ TEST_LIBS = ""
 	patch \
 	minor \
 	major \
-	ldd
+	ldd \
+	tree
 
 all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(LOGS_DIR)
 	@echo "🎯 Build completed successfully at $(BUILD_TIMESTAMP)" | tee -a $(LOG_FILE)
@@ -246,6 +247,10 @@ else ifeq ($(OS_NAME),Msys)
 else
 	@ldd $(DIST_BIN_DIR)/$(TARGET)
 endif
+
+tree: | $(DIST_DIR)
+	@echo "🌳 Distribution directory structure:"
+	@tree ./dist -L 7 2>/dev/null || (echo "📂 tree command not available, using ls -la:" && find ./dist -type d | head -20)
 
 $(DIST_BIN_DIR):
 	@mkdir -p $(DIST_BIN_DIR)
@@ -394,6 +399,7 @@ help:
 	@echo "  check            - Run static analysis"
 	@echo "  lint             - Run code style checker"
 	@echo "  ldd              - Check executable dependencies (otool/ldd/objdump)"
+	@echo "  tree             - Show distribution directory structure"
 	@echo "  test-unit        - Run unit tests"
 	@echo "  test-integration - Run integration tests"
 	@echo "  test-performance - Run performance tests"
