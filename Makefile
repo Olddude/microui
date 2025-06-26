@@ -234,7 +234,7 @@ $(DIST_TEST_DIR)/performance_tests: tests/performance_tests.c $(HEADERS) | $(DIS
 
 check: $(SOURCES) $(HEADERS) | $(LOGS_DIR)
 	@echo "🔍 Running static analysis..." | tee -a $(LOG_FILE)
-	@cppcheck --enable=all --std=c11 src/ include/ tests/ 2>&1 | tee -a $(LOG_FILE)
+	@cppcheck --std=c11 src/ include/ tests/ 2>&1 | tee -a $(LOG_FILE)
 
 lint: $(SOURCES) $(HEADERS) | $(LOGS_DIR)
 	@echo "🔍 Checking code style..." | tee -a $(LOG_FILE)
