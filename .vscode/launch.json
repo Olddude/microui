@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "target",
+      "type": "promptString",
+      "description": "Enter the target",
+      "default": ""
+    }
+  ],
+  "configurations": [
+    {
+      "type": "bashdb",
+      "request": "launch",
+      "name": "[Debug] Shell",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/${input:target}",
+      "args": [],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] C",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/${input:target}",
+      "args": [
+        "-c",
+        "${workspaceFolder}/config/default.microui.conf",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

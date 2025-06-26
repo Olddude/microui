@@ -1,0 +1,190 @@
+name: CI/CD Pipeline
+
+env:
+  PROJECT_NAME: "microui"
+  BUILD_DIR: "${{ github.workspace }}/build"
+  CMAKE_BUILD_TYPE: "Release"
+  CMAKE_PREFIX_PATH: "${{ github.workspace }}/dist"
+  CMAKE_INSTALL_PREFIX: "${{ github.workspace }}/dist"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+  IMAGE_DESCRIPTION: "MICROUI"
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache apt packages
+        uses: actions/cache@v3
+        id: apt-cache
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-xorg-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-xorg-
+            ${{ runner.os }}-apt-
+
+      - name: Install build dependencies
+        run: |
+          make dev-dependencies
+
+      - name: Check
+        run: |
+          make check || true
+
+      - name: Lint
+        run: |
+          make lint || true
+
+      - name: Build
+        run: |
+          make
+
+      - name: Unit tests
+        run: |
+          make test-unit
+
+      - name: Integration tests
+        run: |
+          make test-integration
+
+      - name: Performance tests
+        run: |
+          make test-performance
+
+      - name: Set VERSION
+        run: |
+          VERSION=$(make version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Set BUILD_NUMBER
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Set BUILD_ARTIFACT_NAME
+        run: |
+          echo "BUILD_ARTIFACT_NAME=${{ env.PROJECT_NAME }}-${{ env.VERSION }}-build.${{ env.BUILD_NUMBER }}" >> $GITHUB_ENV
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: dist
+          retention-days: 2
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache system dependencies
+        uses: actions/cache@v3
+        id: cache-system-deps
+        with:
+          path: /var/cache/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Set VERSION
+        run: |
+          VERSION=$(make version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Set BUILD_NUMBER
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Set BUILD_ARTIFACT_NAME
+        run: |
+          echo "BUILD_ARTIFACT_NAME=${{ env.PROJECT_NAME }}-${{ env.VERSION }}-build.${{ env.BUILD_NUMBER }}" >> $GITHUB_ENV
+
+      - name: Set RELEASE_ARTIFACT_NAME
+        run: |
+          echo "RELEASE_ARTIFACT_NAME=${{ env.PROJECT_NAME }}-${{ env.VERSION }}" >> $GITHUB_ENV
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: dist
+
+      - name: Re-upload Artifact for Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.RELEASE_ARTIFACT_NAME }}
+          path: dist
+          retention-days: 90
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Release Artifact for Docker Build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.RELEASE_ARTIFACT_NAME }}
+          path: dist
+
+      - name: Set DOCKER_IMAGE_NAME
+        run: |
+          LOWERCASE_IMAGE_NAME=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          echo "DOCKER_IMAGE_NAME=$LOWERCASE_IMAGE_NAME" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            --build-arg VERSION=${{ env.VERSION }} \
+            --label "org.opencontainers.image.title=${{ env.PROJECT_NAME }}" \
+            --label "org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}" \
+            --label "org.opencontainers.image.version=${{ env.VERSION }}" \
+            --label "org.opencontainers.image.created=${{ github.event.repository.updated_at }}" \
+            --label "org.opencontainers.image.source=${{ github.event.repository.html_url }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest \
+            -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }} \
+            .
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }}
+
+      - name: Create Git Tag
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git tag -a ${{ env.VERSION }} -m "Release ${{ env.VERSION }}" || true
+          git push origin ${{ env.VERSION }} || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,45 @@
+# .clang-format --------------------------------------------------------------
+# Base the style on LLVM (modern, consistent defaults) and override what we need.
+BasedOnStyle: LLVM
+
+### ─── Core indentation width ──────────────────────────────────────────────
+# Four-space indentation everywhere.
+IndentWidth: 4 # Size of each logical indent level.
+TabWidth: 4 # How wide a tab character *renders*.
+UseTab: Never # Never emit real tab characters—use spaces only.
+
+### ─── Brace placement & wrapping ──────────────────────────────────────────
+# Put the opening brace on the same line for functions and control flow.
+BreakBeforeBraces: Custom
+
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false # Control flow gets braces on same line
+  AfterEnum: true
+  AfterFunction: false # Functions get braces on same line
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false # Keep braces flush with their parent scope.
+
+### ─── Extras for clean vertical alignment ─────────────────────────────────
+AlignAfterOpenBracket: BlockIndent # Use block indentation instead of alignment
+AllowShortFunctionsOnASingleLine: Empty # Only `{}` bodies may sit on one line.
+ColumnLimit: 100 # Force wrapping for better parameter separation
+SpacesInAngles: false # `std::vector<int>` not `std::vector< int >`
+SpaceAfterCStyleCast: true
+ReflowComments: true # Auto-wrap and reflow block comments.
+SortIncludes: true # Deterministic, alphabetised includes.
+
+### ─── Function parameter formatting ───────────────────────────────────────
+BinPackParameters: false # Each parameter on its own line when wrapping
+BinPackArguments: false # Each argument on its own line when wrapping
+AllowAllParametersOfDeclarationOnNextLine: false # Force wrapping for long declarations
+AllowAllArgumentsOnNextLine: false # Force wrapping for long function calls
+PenaltyBreakBeforeFirstCallParameter: 0 # Prefer breaking before first parameter
+AlwaysBreakAfterReturnType: None # Keep return type on same line as function name
+IndentWrappedFunctionNames: false # Don't indent wrapped function names
+ContinuationIndentWidth: 4 # Use 4 spaces for continuation lines
+# ----------------------------------------------------------------------------
