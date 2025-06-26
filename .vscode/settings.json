@@ -42,6 +42,7 @@
     "unistd.h": "c",
     "allproxy_server.h": "c",
     "stdbool.h": "c",
-    "*.conf": "ini"
+    "*.conf": "ini",
+    "renderer.h": "c"
   }
 }

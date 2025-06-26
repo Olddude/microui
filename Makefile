@@ -1,6 +1,6 @@
 # Microui Build System
 
-VERSION ?= $(shell cat .version 2>/dev/null || echo "dev")
+VERSION ?= $(shell cat .version 2>/dev/null || echo "latest")
 PREFIX ?= /usr/local
 PATH ?= /usr/local/bin:$(PATH)
 BUILD_TYPE ?= Release
@@ -38,13 +38,15 @@ HEADERS = \
 	include/microui.h \
 	include/renderer.h \
 	include/client.h \
-	include/server.h
+	include/server.h \
+	include/window.h
 
 SOURCES = \
 	src/microui.c \
 	src/renderer.c \
 	src/client.c \
-	src/server.c
+	src/server.c \
+	src/window.c
 
 MAIN = src/main.c
 
@@ -243,8 +245,8 @@ publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share |
 	@cp $(HEADERS) $(PUBLISH_INCLUDE_DIR)/
 	@cp $(DIST_SHARE_DIR)/*.conf $(PUBLISH_SHARE_DIR)/
 	@echo "📋 Creating archive..."
-	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(shell cat ../.version 2>/dev/null || echo "dev").tar.gz bin/ lib/ include/ share/
-	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(shell cat .version 2>/dev/null || echo "dev").tar.gz"
+	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz bin/ lib/ include/ share/
+	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(VERSION).tar.gz"
 
 $(PUBLISH_BIN_DIR):
 	@mkdir -p $(PUBLISH_BIN_DIR)

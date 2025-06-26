@@ -1,15 +1,21 @@
 # microui
 
-## Environment
+A *tiny*, portable, immediate-mode app in ANSI C
 
-Copy this into your local `.env` file
+## Environment
 
 ```bash
 WIDTH='1440'
 HEIGHT='900'
 ```
 
-A *tiny*, portable, immediate-mode UI library written in ANSI C
+## Configuration
+
+See [./config/default.microui.conf](./config/default.microui.conf)
+
+## Build
+
+See [./Makefile](./Makefile)
 
 ## Features
 
@@ -46,27 +52,14 @@ if (mu_begin_window(ctx, "My Window", mu_rect(10, 10, 140, 86))) {
 }
 ```
 
-## Screenshot
-
-![screenshot](https://user-images.githubusercontent.com/3920290/75188642-63ae9580-5744-11ea-9eee-d753ff5c0aa7.png)
-
-[**Browser Demo**](https://floooh.github.io/sokol-html5/sgl-microui-sapp.html)
-
 ## Usage
 
 * See [`doc/usage.md`](doc/usage.md) for usage instructions
-* See the [`demo`](demo) directory for a usage example
 
 ## Notes
 
 The library expects the user to provide input and handle the resultant drawing
 commands, it does not do any drawing itself.
-
-## Contributing
-
-The library is designed to be lightweight, providing a foundation to which you
-can easily add custom controls and UI elements; pull requests adding additional
-features will likely not be merged. Bug reports are welcome.
 
 ## License
 
