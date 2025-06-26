@@ -16,14 +16,14 @@ if [ -f .env ]; then
     set +a
 fi
 
-SCHEMA_PATH="$root_dir_path/share/microui-config.schema.json"
+schema_path="$root_dir_path/share/microui-config.schema.json"
 
 # Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+red='\033[0;31m'
+green='\033[0;32m'
+blue='\033[0;34m'
+yellow='\033[1;33m'
+nocolor='\033[0m' # No Color
 
 print_usage() {
     echo "Usage: validate_json.sh <config_file> [config_file2] ..."
@@ -36,30 +36,30 @@ print_usage() {
 validate_json_file() {
     local config_file="$1"
 
-    echo -e "${BLUE}🔍 Validating: $config_file${NC}"
+    echo -e "${blue}🔍 Validating: $config_file${nocolor}"
 
     # Check if file exists
     if [[ ! -f "$config_file" ]]; then
-        echo -e "${RED}❌ File not found: $config_file${NC}"
+        echo -e "${red}❌ File not found: $config_file${nocolor}"
         return 1
     fi
 
     # Check if file is valid JSON
     if ! jq empty "$config_file" 2>/dev/null; then
-        echo -e "${RED}❌ Invalid JSON in: $config_file${NC}"
+        echo -e "${red}❌ Invalid JSON in: $config_file${nocolor}"
         return 1
     fi
 
     # Extract version
     local version=$(jq -r '.version // "missing"' "$config_file")
     if [[ "$version" == "missing" || "$version" == "null" ]]; then
-        echo -e "${RED}❌ Missing required field 'version' in: $config_file${NC}"
+        echo -e "${red}❌ Missing required field 'version' in: $config_file${nocolor}"
         return 1
     fi
 
     # Check version format (semantic versioning)
     if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$'; then
-        echo -e "${RED}❌ Invalid version format '$version' in: $config_file${NC}"
+        echo -e "${red}❌ Invalid version format '$version' in: $config_file${nocolor}"
         return 1
     fi
 
@@ -67,7 +67,7 @@ validate_json_file() {
     local client_mode=$(jq -r '.client.mode // "missing"' "$config_file")
     if [[ "$client_mode" != "missing" && "$client_mode" != "null" ]]; then
         if [[ ! "$client_mode" =~ ^(window|fullscreen|headless|console)$ ]]; then
-            echo -e "${RED}❌ Invalid client mode '$client_mode' in: $config_file${NC}"
+            echo -e "${red}❌ Invalid client mode '$client_mode' in: $config_file${nocolor}"
             return 1
         fi
     fi
@@ -76,16 +76,16 @@ validate_json_file() {
     local server_mode=$(jq -r '.server.mode // "missing"' "$config_file")
     if [[ "$server_mode" != "missing" && "$server_mode" != "null" ]]; then
         if [[ ! "$server_mode" =~ ^(console|daemon|service|embedded)$ ]]; then
-            echo -e "${RED}❌ Invalid server mode '$server_mode' in: $config_file${NC}"
+            echo -e "${red}❌ Invalid server mode '$server_mode' in: $config_file${nocolor}"
             return 1
         fi
     fi
 
     # Success output
-    echo -e "${GREEN}✅ Valid JSON configuration${NC}"
-    echo -e "   Version: ${YELLOW}$version${NC}"
-    [[ "$client_mode" != "missing" && "$client_mode" != "null" ]] && echo -e "   Client mode: ${YELLOW}$client_mode${NC}"
-    [[ "$server_mode" != "missing" && "$server_mode" != "null" ]] && echo -e "   Server mode: ${YELLOW}$server_mode${NC}"
+    echo -e "${green}✅ Valid JSON configuration${nocolor}"
+    echo -e "   Version: ${yellow}$version${nocolor}"
+    [[ "$client_mode" != "missing" && "$client_mode" != "null" ]] && echo -e "   Client mode: ${yellow}$client_mode${nocolor}"
+    [[ "$server_mode" != "missing" && "$server_mode" != "null" ]] && echo -e "   Server mode: ${yellow}$server_mode${nocolor}"
 
     return 0
 }
@@ -98,19 +98,19 @@ main() {
 
     # Check if jq is available
     if ! command -v jq &>/dev/null; then
-        echo -e "${RED}❌ jq is required but not installed. Install with: brew install jq${NC}"
+        echo -e "${red}❌ jq is required but not installed. Install with: brew install jq${nocolor}"
         exit 1
     fi
 
     # Check if schema exists
-    if [[ ! -f "$SCHEMA_PATH" ]]; then
-        echo -e "${RED}❌ Schema file not found: $SCHEMA_PATH${NC}"
+    if [[ ! -f "$schema_path" ]]; then
+        echo -e "${red}❌ Schema file not found: $schema_path${nocolor}"
         exit 1
     fi
 
-    echo -e "${BLUE}🔍 JSON Configuration Validator${NC}"
+    echo -e "${blue}🔍 JSON Configuration Validator${nocolor}"
     echo "========================================"
-    echo -e "Schema: ${YELLOW}$SCHEMA_PATH${NC}"
+    echo -e "Schema: ${yellow}$schema_path${nocolor}"
     echo ""
 
     local all_valid=true
@@ -123,10 +123,10 @@ main() {
     done
 
     if [[ "$all_valid" == true ]]; then
-        echo -e "${GREEN}🎉 All JSON configurations are valid!${NC}"
+        echo -e "${green}🎉 All JSON configurations are valid!${nocolor}"
         exit 0
     else
-        echo -e "${RED}💥 Some JSON configurations failed validation${NC}"
+        echo -e "${red}💥 Some JSON configurations failed validation${nocolor}"
         exit 1
     fi
 }

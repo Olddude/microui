@@ -1,6 +1,4 @@
-#ifndef CONSOLE_H
-#define CONSOLE_H
-
+#include "console.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,5 +35,3 @@ int console_command_run(int argc, char **argv, char **envp) {
     console_args_free(args);
     return 0;
 }
-
-#endif // CONSOLE_H
