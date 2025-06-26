@@ -34,10 +34,10 @@ jobs:
             ${{ runner.os }}-apt-
 
       - name: Install dev dependencies
-        run: sudo ./scripts/make.sh dev-dependencies
+        run: ./scripts/make.sh dev-dependencies
 
       - name: Install dependencies
-        run: sudo ./scripts/make.sh dependencies
+        run: ./scripts/make.sh dependencies
 
       - name: Check
         run: ./scripts/make.sh check
