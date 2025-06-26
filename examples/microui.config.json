@@ -1,0 +1,21 @@
+{
+  "$schema": "https://github.com/Olddude/microui/schemas/microui-config.schema.json",
+  "version": "0.1.0",
+  "client": {
+    "mode": "window",
+    "width": 1440,
+    "height": 900,
+    "title": "MicroUI Application",
+    "resizable": true,
+    "vsync": true,
+    "fps_limit": 60
+  },
+  "server": {
+    "mode": "console",
+    "host": "localhost",
+    "port": 8080,
+    "max_connections": 100,
+    "timeout": 30,
+    "workers": 4
+  }
+}

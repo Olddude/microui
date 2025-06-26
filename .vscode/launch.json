@@ -5,16 +5,9 @@
       "type": "lldb",
       "request": "launch",
       "name": "[Debug] Client",
-      "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/bin/microui",
-      "args": [
-        "client",
-        "-c",
-        "${workspaceFolder}/config/default.microui.conf",
-        "-l",
-        "3"
-      ],
+      "args": ["client", "-c", "${workspaceFolder}/microui.conf", "-l", "3"],
       "env": {},
       "envFile": "${workspaceFolder}/.env"
     },
@@ -25,13 +18,7 @@
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/bin/microui",
-      "args": [
-        "server",
-        "-c",
-        "${workspaceFolder}/config/default.microui.conf",
-        "-l",
-        "3"
-      ],
+      "args": ["server", "-c", "${workspaceFolder}/microui.conf", "-l", "3"],
       "env": {},
       "envFile": "${workspaceFolder}/.env"
     },
@@ -42,12 +29,7 @@
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/test/unit_tests",
-      "args": [
-        "-c",
-        "${workspaceFolder}/config/default.microui.conf",
-        "-l",
-        "3"
-      ],
+      "args": ["-c", "${workspaceFolder}/microui.conf", "-l", "3"],
       "env": {},
       "envFile": "${workspaceFolder}/.env"
     },
@@ -58,12 +40,7 @@
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/test/integration_tests",
-      "args": [
-        "-c",
-        "${workspaceFolder}/config/default.microui.conf",
-        "-l",
-        "3"
-      ],
+      "args": ["-c", "${workspaceFolder}/microui.conf", "-l", "3"],
       "env": {},
       "envFile": "${workspaceFolder}/.env"
     },
@@ -74,12 +51,7 @@
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/dist/test/performance_tests",
-      "args": [
-        "-c",
-        "${workspaceFolder}/config/default.microui.conf",
-        "-l",
-        "3"
-      ],
+      "args": ["-c", "${workspaceFolder}/microui.conf", "-l", "3"],
       "env": {},
       "envFile": "${workspaceFolder}/.env"
     }
