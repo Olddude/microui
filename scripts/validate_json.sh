@@ -1,14 +1,22 @@
 #!/bin/bash
-#
-# JSON Configuration Validator for MicroUI
-#
-# This script validates JSON configuration files using jq and the MicroUI schema.
-#
-
+# shellcheck disable=SC1091
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCHEMA_PATH="$SCRIPT_DIR/../schemas/microui-config.schema.json"
+script_file_path="${BASH_SOURCE[0]}"
+script_dir_path="$(cd "$(dirname "$script_file_path")" && pwd)"
+root_dir_path="$(cd "$script_dir_path/.." && pwd)"
+
+if [ "$(pwd)" != "$root_dir_path" ]; then
+    cd "$root_dir_path"
+fi
+
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
+SCHEMA_PATH="$root_dir_path/share/microui-config.schema.json"
 
 # Colors for output
 RED='\033[0;31m'
@@ -21,8 +29,8 @@ print_usage() {
     echo "Usage: validate_json.sh <config_file> [config_file2] ..."
     echo ""
     echo "Examples:"
-    echo "  validate_json.sh examples/microui.config.json"
-    echo "  validate_json.sh examples/*.json"
+    echo "  validate_json.sh share/microui.config.json"
+    echo "  validate_json.sh share/*.json"
 }
 
 validate_json_file() {

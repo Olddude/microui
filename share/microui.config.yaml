@@ -1,5 +1,7 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/Olddude/microui/refs/heads/feature/myui/schemas/microui-config.schema.json
+# yaml-language-server: $schema=./microui-config.schema.json
 
+name: "Default MicroUI Configuration"
+description: "Standard configuration for MicroUI applications with windowed client and console server"
 version: "0.1.0"
 
 client:

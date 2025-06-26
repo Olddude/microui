@@ -1,14 +1,22 @@
 #!/bin/bash
-#
-# YAML Configuration Validator for MicroUI
-#
-# This script validates YAML configuration files using yq and the MicroUI schema.
-#
-
+# shellcheck disable=SC1091
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCHEMA_PATH="$SCRIPT_DIR/../schemas/microui-config.schema.json"
+script_file_path="${BASH_SOURCE[0]}"
+script_dir_path="$(cd "$(dirname "$script_file_path")" && pwd)"
+root_dir_path="$(cd "$script_dir_path/.." && pwd)"
+
+if [ "$(pwd)" != "$root_dir_path" ]; then
+    cd "$root_dir_path"
+fi
+
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
+SCHEMA_PATH="$root_dir_path/share/microui-config.schema.json"
 
 # Colors for output
 RED='\033[0;31m'
@@ -21,8 +29,8 @@ print_usage() {
     echo "Usage: validate_yaml.sh <config_file> [config_file2] ..."
     echo ""
     echo "Examples:"
-    echo "  validate_yaml.sh examples/microui.config.yaml"
-    echo "  validate_yaml.sh examples/*.yaml"
+    echo "  validate_yaml.sh share/microui.config.yaml"
+    echo "  validate_yaml.sh share/*.yaml"
 }
 
 validate_yaml_file() {
