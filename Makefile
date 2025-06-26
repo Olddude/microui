@@ -89,7 +89,6 @@ SHARE_FILES = microui.conf
 	debug \
 	release \
 	static \
-	deps \
 	dependencies \
 	dev-dependencies \
 	share \
@@ -131,8 +130,6 @@ else ifeq ($(OS_NAME),Darwin)
 else
 	$(MAKE) LDFLAGS="-static -lSDL2main -lSDL2 -lGL -lm -lpthread -ldl -lasound -lpulse -lX11 -lXext -lXcursor -lXinerama -lXi -lXrandr -lXss -lXxf86vm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon" $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 endif
-
-deps: dependencies
 
 dev-dependencies:
 	@echo "🛠️  Installing development dependencies for $(OS_NAME)..."
@@ -378,9 +375,9 @@ help:
 	@echo "  debug            - Build with debug symbols"
 	@echo "  release          - Build with release optimizations"
 	@echo "  static           - Build with static linking (no SDL2 runtime dependencies)"
-	@echo "  deps/dependencies- Install system dependencies (SDL2)"
+	@echo "  dependencies     - Install system dependencies (SDL2)"
 	@echo "  dev-dependencies - Install development tools (build-essential, clang-format, cppcheck)"
-	@echo "  share           - Copy configuration files to dist directory"
+	@echo "  share            - Copy configuration files to dist directory"
 	@echo "  headers          - Copy header files to dist directory"
 	@echo "  check            - Run static analysis"
 	@echo "  lint             - Run code style checker"
