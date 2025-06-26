@@ -35,11 +35,15 @@ LIB_TARGET ?= lib$(TARGET).a
 
 HEADERS = \
 	include/microui.h \
-	include/renderer.h
+	include/renderer.h \
+	include/client.h \
+	include/server.h
 
 SOURCES = \
+	src/microui.c \
 	src/renderer.c \
-	src/microui.c
+	src/client.c \
+	src/server.c
 
 MAIN = src/main.c
 

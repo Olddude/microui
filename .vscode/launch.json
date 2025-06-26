@@ -10,21 +10,45 @@
   ],
   "configurations": [
     {
-      "type": "bashdb",
+      "type": "lldb",
       "request": "launch",
-      "name": "[Debug] Shell",
+      "name": "[Debug] Source",
+      "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/${input:target}",
-      "args": [],
-      "internalConsoleOptions": "openOnSessionStart"
+      "program": "${workspaceFolder}/dist/bin/microui",
+      "args": [
+        "client",
+        "-c",
+        "${workspaceFolder}/config/default.microui.conf",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
     },
     {
       "type": "lldb",
       "request": "launch",
-      "name": "[Debug] C",
+      "name": "[Debug] UnitTests",
       "preLaunchTask": "build",
       "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/${input:target}",
+      "program": "${workspaceFolder}/dist/test/unit_tests",
+      "args": [
+        "-c",
+        "${workspaceFolder}/config/default.microui.conf",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] Source",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/test/unit_tests",
       "args": [
         "-c",
         "${workspaceFolder}/config/default.microui.conf",
