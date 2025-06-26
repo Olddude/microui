@@ -30,38 +30,34 @@ jobs:
         id: apt-cache
         with:
           path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-xorg-${{ hashFiles('.github/workflows/ci.yml') }}
+          key: ${{ runner.os }}-apt-xorg-${{ hashFiles('.github/workflows/cicd.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-xorg-
             ${{ runner.os }}-apt-
 
       - name: Install build dependencies
-        run: |
-          make dev-dependencies
+        run: make dev-dependencies
+
+      - name: Install dependencies
+        run: make dependencies
 
       - name: Check
-        run: |
-          make check || true
+        run: make check || true
 
       - name: Lint
-        run: |
-          make lint || true
+        run: make lint || true
 
       - name: Build
-        run: |
-          make
+        run: make
 
       - name: Unit tests
-        run: |
-          make test-unit
+        run: make test-unit
 
       - name: Integration tests
-        run: |
-          make test-integration
+        run: make test-integration
 
       - name: Performance tests
-        run: |
-          make test-performance
+        run: make test-performance
 
       - name: Set VERSION
         run: |
@@ -102,7 +98,7 @@ jobs:
         id: cache-system-deps
         with:
           path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cicd.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
