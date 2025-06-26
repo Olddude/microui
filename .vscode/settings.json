@@ -45,6 +45,7 @@
     "*.conf": "ini",
     "renderer.h": "c",
     "condition_variable": "c",
-    "stop_token": "c"
+    "stop_token": "c",
+    "ios": "c"
   }
 }

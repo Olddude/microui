@@ -42,11 +42,11 @@ int main(int argc, char **argv, char **envp) {
     }
 
     if (strcmp(command, CLIENT_COMMAND) == 0) {
-        return client_run(argc, argv, envp, NULL, NULL);
+        return client_run(argc, argv, envp);
     }
 
     if (strcmp(command, SERVER_COMMAND) == 0) {
-        return server_run(argc, argv, envp, NULL, NULL);
+        return server_run(argc, argv, envp);
     }
 
     fprintf(stderr, "Error: Unknown command '%s'\n", command);
