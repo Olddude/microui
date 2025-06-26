@@ -4,18 +4,20 @@ A *tiny*, portable, immediate-mode app in ANSI C
 
 ## Environment
 
+The content of your [.env](.env) file should be as bellow
+
 ```bash
-WIDTH='1440'
-HEIGHT='900'
+PREFIX='/usr/local'
+BUILD_TYPE='Debug'
 ```
 
 ## Configuration
 
-See [./config/default.microui.conf](./config/default.microui.conf)
+See [microui.conf](microui.conf)
 
 ## Build
 
-See [./Makefile](./Makefile)
+See [Makefile](Makefile)
 
 ## Features
 
@@ -54,7 +56,7 @@ if (mu_begin_window(ctx, "My Window", mu_rect(10, 10, 140, 86))) {
 
 ## Usage
 
-* See [`doc/usage.md`](doc/usage.md) for usage instructions
+* See [doc/usage.md](doc/usage.md) for usage instructions
 
 ## Notes
 

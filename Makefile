@@ -1,8 +1,7 @@
 # Microui Build System
 
-VERSION ?= $(shell cat .version 2>/dev/null || echo "latest")
+VERSION = $(shell grep '^version' microui.conf 2>/dev/null | cut -d' ' -f2 || echo "latest")
 PREFIX ?= /usr/local
-PATH ?= /usr/local/bin:$(PATH)
 BUILD_TYPE ?= Release
 
 # OS Detection
@@ -170,7 +169,7 @@ endif
 
 share: | $(DIST_SHARE_DIR)
 	@echo "⚙️  Configuring project..."
-	@cp config/*.conf $(DIST_SHARE_DIR)/
+	@cp microui.conf $(DIST_SHARE_DIR)/
 	@echo "✅ Configuration files copied to $(DIST_SHARE_DIR)/"
 
 headers: | $(DIST_INCLUDE_DIR)
@@ -292,7 +291,7 @@ install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET)
 	@install -m 755 $(DIST_BIN_DIR)/$(TARGET) $(DESTDIR)$(BIN_DIR)/
 	@install -m 644 $(DIST_LIB_DIR)/$(LIB_TARGET) $(DESTDIR)$(LIB_DIR)/
 	@install -m 644 $(HEADERS) $(DESTDIR)$(INCLUDE_DIR)/
-	@install -m 644 config/*.conf $(DESTDIR)$(SHARE_DIR)/
+	@install -m 644 microui.conf $(DESTDIR)$(SHARE_DIR)/
 	@echo "✅ Installation completed!"
 	@echo "📁 Binary: $(BIN_DIR)/$(TARGET)"
 	@echo "📁 Library: $(LIB_DIR)/$(LIB_TARGET)"
@@ -324,32 +323,32 @@ version:
 
 patch:
 	@echo "🔧 Bumping patch version..."
-	@current_version=$$(cat .version); \
+	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	minor=$$(echo $$current_version | cut -d. -f2); \
 	patch=$$(echo $$current_version | cut -d. -f3); \
 	new_patch=$$((patch + 1)); \
 	new_version="$$major.$$minor.$$new_patch"; \
-	echo "$$new_version" > .version; \
+	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 minor:
 	@echo "🔧 Bumping minor version..."
-	@current_version=$$(cat .version); \
+	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	minor=$$(echo $$current_version | cut -d. -f2); \
 	new_minor=$$((minor + 1)); \
 	new_version="$$major.$$new_minor.0"; \
-	echo "$$new_version" > .version; \
+	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 major:
 	@echo "🔧 Bumping major version..."
-	@current_version=$$(cat .version); \
+	@current_version=$$(grep '^version' microui.conf | cut -d' ' -f2); \
 	major=$$(echo $$current_version | cut -d. -f1); \
 	new_major=$$((major + 1)); \
 	new_version="$$new_major.0.0"; \
-	echo "$$new_version" > .version; \
+	sed -i.bak "s/^version .*/version $$new_version/" microui.conf && rm microui.conf.bak; \
 	echo "✅ Version bumped from $$current_version to $$new_version"
 
 clean:
