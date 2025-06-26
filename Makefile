@@ -139,8 +139,8 @@ else ifeq ($(OS_NAME),Darwin)
 	@echo "   Note: Xcode Command Line Tools should already provide build-essential"
 else
 	@echo "🐧 Installing development tools for Linux..."
-	@apt-get update -y
-	@apt-get install -y build-essential clang-format cppcheck
+	@sudo apt-get update -y
+	@sudo apt-get install -y build-essential clang-format cppcheck
 	@echo "✅ Development tools installed successfully"
 endif
 
@@ -156,8 +156,8 @@ else ifeq ($(OS_NAME),Darwin)
 	@echo "✅ SDL2 installed successfully"
 else
 	@echo "🐧 Installing SDL2 for Linux..."
-	@apt-get update -y
-	@apt-get install libsdl2-dev -y
+	@sudo apt-get update -y
+	@sudo apt-get install libsdl2-dev -y
 	@echo "✅ SDL2 development libraries installed successfully"
 endif
 
