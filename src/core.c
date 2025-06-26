@@ -16,9 +16,6 @@ static bool signal_handlers_installed = false;
 typedef struct
 {
     callback_t callback;
-    int argc;
-    char **argv;
-    char **envp;
     execution_context_t *ctx;
     callback_result_t *result;
     pthread_mutex_t *mutex;
@@ -221,7 +218,7 @@ static void ctx_abort(execution_context_t *ctx) {
     if (ctx) {
         ctx->completed = true;
         if (ctx->on_error) {
-            ctx->on_error(0, NULL, NULL);
+            ctx->on_error(ctx->argc, ctx->argv, ctx->envp);
         }
     }
 }
@@ -276,9 +273,6 @@ static void execute_parallel(execution_context_t *ctx) {
     // Launch threads
     for (int i = 0; i < callback_count && current; i++) {
         thread_data[i].callback = current->callback;
-        thread_data[i].argc = ctx->argc;
-        thread_data[i].argv = ctx->argv;
-        thread_data[i].envp = ctx->envp;
         thread_data[i].ctx = ctx;
         thread_data[i].result = &current->result;
         thread_data[i].mutex = &mutex;
@@ -318,14 +312,14 @@ static void *thread_callback_wrapper(void *arg) {
     thread_data_t *data = (thread_data_t *) arg;
 
     if (data->callback) {
-        data->callback(data->argc, data->argv, data->envp, data->ctx);
+        data->callback(data->ctx->argc, data->ctx->argv, data->ctx->envp, data->ctx);
 
         pthread_mutex_lock(data->mutex);
         *(data->result) = RESULT_SUCCESS;
         (*data->active_count)--;
 
         if (data->ctx->on_next) {
-            data->ctx->on_next(data->argc, data->argv, data->envp);
+            data->ctx->on_next(data->ctx->argc, data->ctx->argv, data->ctx->envp);
         }
         pthread_mutex_unlock(data->mutex);
     }
@@ -418,7 +412,7 @@ static void cleanup_all_contexts(void) {
 
             // Call error handler if available
             if (ctx->on_error) {
-                ctx->on_error(0, NULL, NULL);
+                ctx->on_error(ctx->argc, ctx->argv, ctx->envp);
             }
         }
     }
