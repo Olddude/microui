@@ -32,7 +32,7 @@ static void server_listen_callback(int argc, char **argv, char **envp, execution
         printf("Server: Waiting for client connections... (iteration %d)\n", ++connection_count);
 
         // Try to run console operations, but don't fail if they don't work
-        int console_result = console_run(argc, argv, envp);
+        int console_result = console_command_run(argc, argv, envp);
         if (console_result == 0) {
             printf("Server: Console operation successful\n");
         }
@@ -89,7 +89,7 @@ static void server_add_handler(execution_context_t *ctx, callback_t handler) {
 }
 
 // Enhanced server run with execution context
-int server_run(int argc, char **argv, char **envp) {
+static int server_command_run(int argc, char **argv, char **envp) {
     execution_context_t *ctx = server_create_context(EXEC_PARALLEL);
     if (!ctx) {
         return 1;

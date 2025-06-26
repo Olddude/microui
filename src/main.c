@@ -8,16 +8,18 @@
 #define SERVER_COMMAND "server"
 #define HELP_COMMAND "help"
 
-static void print_help(const char *program_name) {
-    printf("Usage: %s <command>\n\n", program_name);
+static int help_command_run(int argc, char **argv, char **envp) {
+    const char *program = argv[0];
+    printf("Usage: %s <command>\n\n", program);
     printf("Commands:\n");
     printf("  %s    Run the client\n", CLIENT_COMMAND);
     printf("  %s    Run the server\n", SERVER_COMMAND);
     printf("  %s      Show this help message\n", HELP_COMMAND);
     printf("\nExamples:\n");
-    printf("  %s %s\n", program_name, CLIENT_COMMAND);
-    printf("  %s %s\n", program_name, SERVER_COMMAND);
-    printf("  %s %s\n", program_name, HELP_COMMAND);
+    printf("  %s %s\n", program, CLIENT_COMMAND);
+    printf("  %s %s\n", program, SERVER_COMMAND);
+    printf("  %s %s\n", program, HELP_COMMAND);
+    return 0;
 }
 
 int main(int argc, char **argv, char **envp) {
@@ -37,16 +39,15 @@ int main(int argc, char **argv, char **envp) {
     const char *command = argv[1];
 
     if (strcmp(command, HELP_COMMAND) == 0) {
-        print_help(argv[0]);
-        return 1;
+        return help_command_run(argc, argv, envp);
     }
 
     if (strcmp(command, CLIENT_COMMAND) == 0) {
-        return client_run(argc, argv, envp);
+        return client_command_run(argc, argv, envp);
     }
 
     if (strcmp(command, SERVER_COMMAND) == 0) {
-        return server_run(argc, argv, envp);
+        return server_command_run(argc, argv, envp);
     }
 
     fprintf(stderr, "Error: Unknown command '%s'\n", command);

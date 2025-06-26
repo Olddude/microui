@@ -260,7 +260,7 @@ static int text_height(mu_Font font) {
     return r_get_text_height();
 }
 
-int window_run(int argc, char **argv, char **envp) {
+static int window_command_run(int argc, char **argv, char **envp) {
     /* init SDL and renderer */
     SDL_Init(SDL_INIT_EVERYTHING);
     r_init();

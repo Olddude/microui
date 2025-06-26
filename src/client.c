@@ -24,7 +24,7 @@ static void client_connect_callback(int argc, char **argv, char **envp, executio
 
 static void client_process_callback(int argc, char **argv, char **envp, execution_context_t *ctx) {
     printf("Client: Processing request...\n");
-    if (window_run(argc, argv, envp) != 0) {
+    if (window_command_run(argc, argv, envp) != 0) {
         printf("Client: Window operation failed\n");
     }
     (void) ctx;
@@ -49,7 +49,7 @@ static void client_add_middleware(execution_context_t *ctx, callback_t middlewar
 }
 
 // Enhanced client run with execution context
-int client_run(int argc, char **argv, char **envp) {
+static int client_command_run(int argc, char **argv, char **envp) {
     execution_context_t *ctx = client_create_context(EXEC_SEQUENTIAL);
     if (!ctx) {
         return 1;
