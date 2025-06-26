@@ -1,4 +1,13 @@
-# ![microui](https://user-images.githubusercontent.com/3920290/75171571-be83c500-5723-11ea-8a50-504cc2ae1109.png)
+# microui
+
+## Environment
+
+Copy this into your local `.env` file
+
+```bash
+WIDTH='1440'
+HEIGHT='900'
+```
 
 A *tiny*, portable, immediate-mode UI library written in ANSI C
 
@@ -13,8 +22,6 @@ A *tiny*, portable, immediate-mode UI library written in ANSI C
 * Simple layout system
 
 ## Example
-
-![example](https://user-images.githubusercontent.com/3920290/75187058-2b598800-5741-11ea-9358-38caf59f8791.png)
 
 ```c
 if (mu_begin_window(ctx, "My Window", mu_rect(10, 10, 140, 86))) {

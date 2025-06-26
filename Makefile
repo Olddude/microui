@@ -52,15 +52,22 @@ DIST_BIN_DIR = $(DIST_DIR)/bin
 DIST_LIB_DIR = $(DIST_DIR)/lib
 DIST_OBJ_DIR = $(DIST_DIR)/obj
 DIST_TEST_DIR = $(DIST_DIR)/test
-DIST_CONF_DIR = $(DIST_DIR)/config
+DIST_SHARE_DIR = $(DIST_DIR)/share
 DIST_INCLUDE_DIR = $(DIST_DIR)/include
+
+PUBLISH_DIR = publish
+PUBLISH_BIN_DIR = $(PUBLISH_DIR)/bin
+PUBLISH_LIB_DIR = $(PUBLISH_DIR)/lib
+PUBLISH_SHARE_DIR = $(PUBLISH_DIR)/share
+PUBLISH_INCLUDE_DIR = $(PUBLISH_DIR)/include
+
+ARTIFACTS_DIR = artifacts
 
 BIN_DIR = $(PREFIX)/bin
 INCLUDE_DIR = $(PREFIX)/include/$(TARGET)
 LIB_DIR = $(PREFIX)/lib/$(TARGET)
-CONF_DIR = $(PREFIX)/etc/$(TARGET)
-LOG_DIR = $(PREFIX)/var/log/$(TARGET)
 SHARE_DIR = $(PREFIX)/share/$(TARGET)
+LOG_DIR = $(PREFIX)/var/log/$(TARGET)
 
 OBJECTS = $(SOURCES:.c=.o)
 MAIN_OBJ = $(MAIN:.c=.o)
@@ -71,7 +78,7 @@ TEST_SOURCES = tests/integration_tests.c tests/unit_tests.c tests/performance_te
 TEST_TARGETS = $(DIST_TEST_DIR)/integration_tests $(DIST_TEST_DIR)/unit_tests $(DIST_TEST_DIR)/performance_tests
 TEST_LIBS = ""
 
-CONF_FILES = microui.conf
+SHARE_FILES = microui.conf
 
 .PHONY: \
 	all \
@@ -81,7 +88,7 @@ CONF_FILES = microui.conf
 	deps \
 	dependencies \
 	dev-dependencies \
-	config \
+	share \
 	headers \
 	check \
 	lint \
@@ -91,22 +98,24 @@ CONF_FILES = microui.conf
 	install \
 	install-lib \
 	uninstall \
+	publish \
 	clean \
+	clean-full \
 	help \
 	version \
 	patch \
 	minor \
 	major
 
-all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers config
+all: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 
 lib: $(DIST_LIB_DIR)/$(LIB_TARGET) headers
 
 debug: CFLAGS += $(DEBUG_FLAGS)
-debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers config
+debug: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 
 release: CFLAGS += $(RELEASE_FLAGS)
-release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers config
+release: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share
 
 deps: dependencies
 
@@ -147,10 +156,10 @@ else
 	@echo "✅ SDL2 development libraries installed successfully"
 endif
 
-config: | $(DIST_CONF_DIR)
+share: | $(DIST_SHARE_DIR)
 	@echo "⚙️  Configuring project..."
-	@cp config/*.conf $(DIST_CONF_DIR)/
-	@echo "✅ Configuration files copied to $(DIST_CONF_DIR)/"
+	@cp config/*.conf $(DIST_SHARE_DIR)/
+	@echo "✅ Configuration files copied to $(DIST_SHARE_DIR)/"
 
 headers: | $(DIST_INCLUDE_DIR)
 	@echo "📋 Copying headers to dist/include/..."
@@ -173,17 +182,17 @@ $(DIST_OBJ_DIR)/%.o: src/%.c $(HEADERS) | $(DIST_OBJ_DIR)
 	@echo "🔨 Compiling $< → $(notdir $@)"
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test-unit: $(DIST_TEST_DIR)/unit_tests config
+test-unit: $(DIST_TEST_DIR)/unit_tests share
 	@echo "🧪 Running unit tests..."
 	@mkdir -p $(DIST_TEST_DIR)
 	@cd $(DIST_TEST_DIR) && ./unit_tests
 
-test-integration: $(DIST_TEST_DIR)/integration_tests config
+test-integration: $(DIST_TEST_DIR)/integration_tests share
 	@echo "🔬 Running integration tests..."
 	@mkdir -p $(DIST_TEST_DIR)
 	@cd $(DIST_TEST_DIR) && ./integration_tests
 
-test-performance: $(DIST_TEST_DIR)/performance_tests config
+test-performance: $(DIST_TEST_DIR)/performance_tests share
 	@echo "⚡ Running performance tests..."
 	@mkdir -p $(DIST_TEST_DIR)
 	@cd $(DIST_TEST_DIR) && ./performance_tests
@@ -220,28 +229,53 @@ $(DIST_OBJ_DIR):
 $(DIST_TEST_DIR):
 	@mkdir -p $(DIST_TEST_DIR)
 
-$(DIST_CONF_DIR):
-	@mkdir -p $(DIST_CONF_DIR)
+$(DIST_SHARE_DIR):
+	@mkdir -p $(DIST_SHARE_DIR)
 
 $(DIST_INCLUDE_DIR):
 	@mkdir -p $(DIST_INCLUDE_DIR)
+
+publish: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET) headers share | $(PUBLISH_BIN_DIR) $(PUBLISH_LIB_DIR) $(PUBLISH_SHARE_DIR) $(PUBLISH_INCLUDE_DIR) $(ARTIFACTS_DIR)
+	@echo "📦 Preparing publish package..."
+	@cp $(DIST_BIN_DIR)/$(TARGET) $(PUBLISH_BIN_DIR)/
+	@cp $(DIST_LIB_DIR)/$(LIB_TARGET) $(PUBLISH_LIB_DIR)/
+	@cp $(HEADERS) $(PUBLISH_INCLUDE_DIR)/
+	@cp $(DIST_SHARE_DIR)/*.conf $(PUBLISH_SHARE_DIR)/
+	@echo "📋 Creating archive..."
+	@cd $(PUBLISH_DIR) && tar -czf ../$(ARTIFACTS_DIR)/$(TARGET)-$(shell cat ../.version 2>/dev/null || echo "dev").tar.gz bin/ lib/ include/ share/
+	@echo "✅ Publish package created: $(ARTIFACTS_DIR)/$(TARGET)-$(shell cat .version 2>/dev/null || echo "dev").tar.gz"
+
+$(PUBLISH_BIN_DIR):
+	@mkdir -p $(PUBLISH_BIN_DIR)
+
+$(PUBLISH_LIB_DIR):
+	@mkdir -p $(PUBLISH_LIB_DIR)
+
+$(PUBLISH_SHARE_DIR):
+	@mkdir -p $(PUBLISH_SHARE_DIR)
+
+$(PUBLISH_INCLUDE_DIR):
+	@mkdir -p $(PUBLISH_INCLUDE_DIR)
+
+$(ARTIFACTS_DIR):
+	@mkdir -p $(ARTIFACTS_DIR)
 
 install: $(DIST_BIN_DIR)/$(TARGET) $(DIST_LIB_DIR)/$(LIB_TARGET)
 	@echo "📥 Installing to $(PREFIX)..."
 	@install -d $(DESTDIR)$(BIN_DIR)
 	@install -d $(DESTDIR)$(LIB_DIR)
 	@install -d $(DESTDIR)$(INCLUDE_DIR)
-	@install -d $(DESTDIR)$(CONF_DIR)
+	@install -d $(DESTDIR)$(SHARE_DIR)
 	@install -d $(DESTDIR)$(LOG_DIR)
 	@install -m 755 $(DIST_BIN_DIR)/$(TARGET) $(DESTDIR)$(BIN_DIR)/
 	@install -m 644 $(DIST_LIB_DIR)/$(LIB_TARGET) $(DESTDIR)$(LIB_DIR)/
 	@install -m 644 $(HEADERS) $(DESTDIR)$(INCLUDE_DIR)/
-	@install -m 644 config/*.conf $(DESTDIR)$(CONF_DIR)/
+	@install -m 644 config/*.conf $(DESTDIR)$(SHARE_DIR)/
 	@echo "✅ Installation completed!"
 	@echo "📁 Binary: $(BIN_DIR)/$(TARGET)"
 	@echo "📁 Library: $(LIB_DIR)/$(LIB_TARGET)"
 	@echo "📁 Headers: $(INCLUDE_DIR)/"
-	@echo "📁 Config: $(CONF_DIR)/"
+	@echo "📁 Config: $(SHARE_DIR)/"
 	@echo "📁 Logs: $(LOG_DIR)/"
 
 install-lib: $(DIST_LIB_DIR)/$(LIB_TARGET)
@@ -259,7 +293,7 @@ uninstall:
 	@rm -f $(DESTDIR)$(BIN_DIR)/$(TARGET)
 	@rm -f $(DESTDIR)$(LIB_DIR)/$(LIB_TARGET)
 	@rm -rf $(DESTDIR)$(INCLUDE_DIR)
-	@rm -rf $(DESTDIR)$(CONF_DIR)
+	@rm -rf $(DESTDIR)$(SHARE_DIR)
 	@echo "✅ Uninstallation completed!"
 
 # Version management targets
@@ -299,7 +333,16 @@ major:
 clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@rm -rf $(DIST_DIR)
+	@rm -rf $(PUBLISH_DIR)
 	@echo "✅ Cleanup completed!"
+
+clean-full:
+	@echo "🧹 Cleaning all artifacts and environment files..."
+	@rm -rf $(DIST_DIR)
+	@rm -rf $(PUBLISH_DIR)
+	@rm -rf $(ARTIFACTS_DIR)
+	@rm -f .env
+	@echo "✅ Full cleanup completed!"
 
 help:
 	@echo "🚀 Microui Build System"
@@ -311,7 +354,7 @@ help:
 	@echo "  release          - Build with release optimizations"
 	@echo "  deps/dependencies- Install system dependencies (SDL2)"
 	@echo "  dev-dependencies - Install development tools (build-essential, clang-format, cppcheck)"
-	@echo "  config           - Copy configuration files to dist directory"
+	@echo "  share           - Copy configuration files to dist directory"
 	@echo "  headers          - Copy header files to dist directory"
 	@echo "  check            - Run static analysis"
 	@echo "  lint             - Run code style checker"
@@ -320,8 +363,10 @@ help:
 	@echo "  test-performance - Run performance tests"
 	@echo "  install          - Install binary and library to system (use PREFIX=path to customize)"
 	@echo "  install-lib      - Install only library and headers to system"
+	@echo "  publish          - Create a distributable package with bin, lib, include, and share files"
 	@echo "  uninstall        - Remove from system"
-	@echo "  clean            - Remove all build artifacts"
+	@echo "  clean            - Remove build artifacts (keeps artifacts/ and .env files)"
+	@echo "  clean-full       - Remove all artifacts including artifacts/ and .env files"
 	@echo "  version          - Display current version"
 	@echo "  patch            - Bump patch version (x.y.z -> x.y.z+1)"
 	@echo "  minor            - Bump minor version (x.y.z -> x.y+1.0)"

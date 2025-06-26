@@ -1,4 +1,7 @@
+artifacts/
 dist/
+publish/
 
+.DS_STORE
 .env*
 !.env.example
