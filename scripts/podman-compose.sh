@@ -16,4 +16,4 @@ if [ -f .env ]; then
     set +a
 fi
 
-make test-performance
+podman-compose "$@"

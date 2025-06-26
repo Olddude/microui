@@ -16,4 +16,4 @@ if [ -f .env ]; then
     set +a
 fi
 
-podman-compose up "$@"
+make "$@"
