@@ -8,17 +8,14 @@ COPY share/ ./share/
 COPY src/ ./src/
 COPY tests/ ./tests/
 COPY Makefile ./Makefile
-RUN ./scripts/make.sh dev-dependencies
-RUN ./scripts/make.sh dependencies
-RUN ./scripts/make.sh build-release
+RUN ./scripts/install-dev-dependencies.sh
+RUN ./scripts/install-dependencies.sh
+RUN ./scripts/make.sh release
 
 FROM ubuntu:22.04 AS runtime
 WORKDIR /app
-RUN apt-get update -y
-RUN apt-get install -y build-essential make
 COPY --from=build /app/dist/ ./dist/
-COPY scripts/ ./scripts/
-COPY Makefile ./Makefile
-RUN ./scripts/make.sh dependencies
-ENTRYPOINT [ "./scripts/microui.sh" ]
-CMD ["server"]
+COPY scripts/install-dependencies.sh ./scripts/install-dependencies.sh
+RUN ./scripts/install-dependencies.sh
+RUN rm -rf ./scripts
+ENTRYPOINT [ "./dist/bin/microui" ]

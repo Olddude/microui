@@ -1,11 +1,16 @@
 version: "3.8"
 
+networks:
+  microui:
+    driver: bridge
+
 services:
-  microui-server:
+  server:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: microui-server
+    networks:
+      - microui
     ports:
       - "8080:8080"
     command: ["server"]
