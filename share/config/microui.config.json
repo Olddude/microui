@@ -1,0 +1,23 @@
+{
+  "$schema": "../schema/microui-config.schema.json",
+  "name": "microui",
+  "description": "A *tiny*, portable, immediate-mode app in ANSI C",
+  "version": "0.1.0",
+  "client": {
+    "mode": "window",
+    "width": 1440,
+    "height": 900,
+    "title": "MicroUI Client",
+    "resizable": true,
+    "vsync": true,
+    "fps_limit": 60
+  },
+  "server": {
+    "mode": "console",
+    "host": "localhost",
+    "port": 8080,
+    "max_connections": 100,
+    "timeout": 30,
+    "workers": 4
+  }
+}

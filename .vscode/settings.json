@@ -1,0 +1,51 @@
+{
+  "editor.formatOnSave": true,
+  "C_Cpp.default.cppStandard": "c++11",
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.includePath": [
+    "/usr/include/**",
+    "/usr/local/include/**",
+    "~/.local/include/**",
+    "/opt/homebrew/include/**",
+    "${workspaceFolder}/include/**"
+  ],
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+  "C_Cpp.default.macFrameworkPath": [
+    "/System/Library/Frameworks",
+    "/Library/Frameworks"
+  ],
+  "[c]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[helm]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.bracketSpacing": false
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[conf]": {
+    "editor.defaultFormatter": "teclado.vscode-nginx-format"
+  },
+  "cmake.ignoreCMakeListsMissing": true,
+  "files.associations": {
+    "defaults.h": "c",
+    "unistd.h": "c",
+    "allproxy_server.h": "c",
+    "stdbool.h": "c",
+    "*.conf": "ini",
+    "renderer.h": "c",
+    "condition_variable": "c",
+    "stop_token": "c",
+    "ios": "c"
+  }
+}

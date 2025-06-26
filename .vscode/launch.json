@@ -1,0 +1,86 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] Client",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/bin/microui",
+      "args": [
+        "client",
+        "-c",
+        "${workspaceFolder}/dist/share/config/microui.config.json",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] Server",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/bin/microui",
+      "args": [
+        "server",
+        "-c",
+        "${workspaceFolder}/dist/share/config/microui.config.json",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] UnitTests",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/test/unit_tests",
+      "args": [
+        "-c",
+        "${workspaceFolder}/dist/share/config/microui.config.json",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] IntegrationTests",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/test/integration_tests",
+      "args": [
+        "-c",
+        "${workspaceFolder}/dist/share/config/microui.config.json",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "[Debug] PerformanceTests",
+      "preLaunchTask": "build",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/dist/test/performance_tests",
+      "args": [
+        "-c",
+        "${workspaceFolder}/dist/share/config/microui.config.json",
+        "-l",
+        "3"
+      ],
+      "env": {},
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
