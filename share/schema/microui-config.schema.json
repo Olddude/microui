@@ -42,7 +42,7 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["window", "fullscreen", "headless", "console"],
+          "enum": ["window", "console"],
           "description": "Client rendering mode",
           "default": "window"
         },
@@ -93,7 +93,7 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["console", "daemon", "service", "embedded"],
+          "enum": ["console"],
           "description": "Server operation mode",
           "default": "console"
         },

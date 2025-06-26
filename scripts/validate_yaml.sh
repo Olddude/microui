@@ -16,7 +16,7 @@ if [ -f .env ]; then
     set +a
 fi
 
-schema_path="$root_dir_path/share/microui-config.schema.json"
+schema_path="$root_dir_path/share/schema/microui-config.schema.json"
 
 # Colors for output
 red='\033[0;31m'
@@ -29,8 +29,8 @@ print_usage() {
     echo "Usage: validate_yaml.sh <config_file> [config_file2] ..."
     echo ""
     echo "Examples:"
-    echo "  validate_yaml.sh share/microui.config.yaml"
-    echo "  validate_yaml.sh share/*.yaml"
+    echo "  validate_yaml.sh share/config/microui.config.yaml"
+    echo "  validate_yaml.sh share/config/*.yaml"
 }
 
 validate_yaml_file() {
