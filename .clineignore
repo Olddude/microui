@@ -1,0 +1,9 @@
+.github/
+.vscode/
+artifacts/
+dist/
+logs/
+
+.env
+.gitignore
+.clang-format
